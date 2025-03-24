@@ -6,7 +6,7 @@ import TestCaseManagement from '../views/TestCaseManagementView.vue'
 import Home from '../views/HomeView.vue'
 import About from '../views/AboutView.vue'
 import MonitoringDashboard from '../views/MonitoringDashboard.vue'
-import ServerMaintenance from '../views/ServerMaintenanceView.vue'
+import VisualEditor from '../views/VisualEditorView.vue'
 import JobManagement from '../views/JobManagementView.vue'
 
 const routes = [
@@ -32,9 +32,9 @@ const routes = [
     component: TestCaseManagement
   },
   {
-    path: '/maintenance',
-    name: 'ServerMaintenance',
-    component: ServerMaintenance
+    path: '/visual-editor',
+    name: 'VisualEditor',
+    component: VisualEditor
   },
   {
     path: '/monitoring',
