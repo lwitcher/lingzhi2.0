@@ -2,20 +2,20 @@
   <div class="flow-editor">
     <div class="toolbar">
       <div class="toolbar-left">
-        <el-button-group>
-          <el-button type="primary" @click="handleSave">
+        <div class="button-group">
+          <el-button type="primary" @click="handleSave" class="action-button">
             <el-icon><Save /></el-icon>
             保存
           </el-button>
-          <el-button type="success" @click="handleImport">
+          <el-button type="success" @click="handleImport" class="action-button">
             <el-icon><Upload /></el-icon>
             导入
           </el-button>
-          <el-button type="warning" @click="handleExport">
+          <el-button type="warning" @click="handleExport" class="action-button">
             <el-icon><Download /></el-icon>
             导出
           </el-button>
-        </el-button-group>
+        </div>
 
         <el-divider direction="vertical" />
 
@@ -86,31 +86,48 @@
             <el-form-item label="文本">
               <el-input v-model="selectedNode.text.value" @change="updateNodeText"></el-input>
             </el-form-item>
+            <template v-if="selectedNode.type === 'rect'">
+              <el-form-item label="会员号">
+                <el-input v-model="selectedNode.properties.memberId" @change="updateNodeProperties"></el-input>
+              </el-form-item>
+              <el-form-item label="席位号">
+                <el-input v-model="selectedNode.properties.seatId" @change="updateNodeProperties"></el-input>
+              </el-form-item>
+              <el-form-item label="交易类型">
+                <el-select v-model="selectedNode.properties.tradeType" @change="updateNodeProperties">
+                  <el-option label="期货" value="期货"></el-option>
+                  <el-option label="期权" value="期权"></el-option>
+                  <el-option label="套利互换UDS" value="套利互换UDS"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="订单属性">
+                <el-select v-model="selectedNode.properties.orderProperty" @change="updateNodeProperties">
+                  <el-option label="无属性" value="无属性"></el-option>
+                  <el-option label="FAK" value="FAK"></el-option>
+                  <el-option label="FOK" value="FOK"></el-option>
+                </el-select>
+              </el-form-item>
+            </template>
+            <template v-if="selectedNode.type === 'circle'">
+              <el-form-item label="系统委托号">
+                <el-input 
+                  type="textarea" 
+                  v-model="selectedNode.properties.systemOrderId" 
+                  :rows="3"
+                  @change="updateNodeProperties"
+                ></el-input>
+              </el-form-item>
+            </template>
+            <el-form-item label="用例描述">
+              <el-input 
+                type="textarea" 
+                v-model="selectedNode.properties.description" 
+                :rows="3"
+                placeholder="请输入用例描述"
+                @change="updateNodeDescription"
+              ></el-input>
+            </el-form-item>
             <template v-if="selectedNode.properties">
-              <el-form-item label="宽度" v-if="selectedNode.type !== 'circle'">
-                <el-input-number 
-                  v-model="selectedNode.width" 
-                  :min="50" 
-                  :max="500" 
-                  @change="updateNodeSize"
-                ></el-input-number>
-              </el-form-item>
-              <el-form-item label="高度" v-if="selectedNode.type !== 'circle'">
-                <el-input-number 
-                  v-model="selectedNode.height" 
-                  :min="30" 
-                  :max="300" 
-                  @change="updateNodeSize"
-                ></el-input-number>
-              </el-form-item>
-              <el-form-item label="半径" v-if="selectedNode.type === 'circle'">
-                <el-input-number 
-                  v-model="selectedNode.r" 
-                  :min="15" 
-                  :max="100" 
-                  @change="updateNodeSize"
-                ></el-input-number>
-              </el-form-item>
               <el-form-item label="颜色">
                 <el-color-picker v-model="selectedNode.properties.color" @change="updateNodeStyle"></el-color-picker>
               </el-form-item>
@@ -219,9 +236,9 @@
 /**
  * @description 基于LogicFlow的流程图编辑器组件
  */
-import { ref, onMounted, reactive, nextTick } from 'vue';
+import { ref, onMounted, reactive, nextTick, onUnmounted } from 'vue';
 import LogicFlow from '@logicflow/core';
-import { DndPanel, Control, SelectionSelect, MiniMap } from '@logicflow/extension';
+import { DndPanel, Control, SelectionSelect, MiniMap, ProximityConnect } from '@logicflow/extension';
 import '@logicflow/core/dist/index.css';
 import '@logicflow/extension/lib/index.css';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
@@ -238,7 +255,7 @@ export default {
     const canUndo = ref(false);
     const canRedo = ref(false);
     const selectedNode = ref(null);
-    const selectedEdge = ref(null);
+    const selectedEdge = ref(false);
     const importDialogVisible = ref(false);
     const saveDialogVisible = ref(false);
     const importType = ref('json');
@@ -252,10 +269,40 @@ export default {
 
     // 定义可拖拽的节点类型
     const nodeList = [
-      { type: 'rect', label: '矩形', properties: { width: 120, height: 60, color: '#FFFFFF', borderColor: '#1890FF' } },
-      { type: 'circle', label: '圆形', properties: { r: 35, color: '#FFFFFF', borderColor: '#1890FF' } },
-      { type: 'diamond', label: '菱形', properties: { width: 120, height: 80, color: '#FFFFFF', borderColor: '#1890FF' } },
-      { type: 'ellipse', label: '椭圆', properties: { width: 120, height: 60, color: '#FFFFFF', borderColor: '#1890FF' } }
+      { 
+        type: 'rect', 
+        label: '下单', 
+        properties: { 
+          width: 120, 
+          height: 60, 
+          color: '#FFFFFF', 
+          borderColor: '#1890FF',
+          memberId: '',
+          seatId: '',
+          tradeType: '期货',
+          orderProperty: '无属性'
+        } 
+      },
+      { 
+        type: 'circle', 
+        label: '撤单', 
+        properties: { 
+          r: 35, 
+          color: '#FFFFFF', 
+          borderColor: '#1890FF',
+          systemOrderId: ''
+        } 
+      },
+      { 
+        type: 'diamond', 
+        label: '获取结果', 
+        properties: { 
+          width: 120, 
+          height: 80, 
+          color: '#FFFFFF', 
+          borderColor: '#1890FF'
+        } 
+      }
     ];
 
     // 初始化流程图编辑器
@@ -265,6 +312,7 @@ export default {
       LogicFlow.use(SelectionSelect);
       LogicFlow.use(Control);
       LogicFlow.use(MiniMap);
+      LogicFlow.use(ProximityConnect);
 
       // 创建编辑器实例
       lf.value = new LogicFlow({
@@ -275,7 +323,12 @@ export default {
         edgeTextEdit: true,
         edgeType: 'polyline',
         stopZoomGraph: false,
-        stopScrollGraph: false
+        stopScrollGraph: false,
+        pluginOptions: {
+          proximityConnect: {
+            distance: 200 // 连接触发距离
+          }
+        }
       });
 
       // 初始化
@@ -304,11 +357,32 @@ export default {
         selectedNode.value = null;
         selectedEdge.value = null;
       });
+
+      // 监听键盘删除事件
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          e.preventDefault(); // 阻止默认的浏览器行为
+          if (selectedNode.value) {
+            lf.value.deleteNode(selectedNode.value.id);
+            selectedNode.value = null;
+          } else if (selectedEdge.value) {
+            lf.value.deleteEdge(selectedEdge.value.id);
+            selectedEdge.value = null;
+          }
+        }
+      });
     });
 
     // 节点拖拽开始
     const onDragStart = (e, node) => {
+      e.preventDefault(); // 阻止默认的拖拽行为
       if (lf.value) {
+        // 阻止文本选择
+        document.body.style.userSelect = 'none';
+        document.body.style.webkitUserSelect = 'none';
+        document.body.style.mozUserSelect = 'none';
+        document.body.style.msUserSelect = 'none';
+        
         lf.value.dnd.startDrag({
           type: node.type,
           properties: { ...node.properties },
@@ -553,6 +627,29 @@ export default {
       }
     };
 
+    // 更新节点描述
+    const updateNodeDescription = () => {
+      if (selectedNode.value && lf.value) {
+        const node = { ...selectedNode.value };
+        lf.value.updateNodeProperties(node.id, {
+          description: node.properties.description
+        });
+      }
+    };
+
+    // 更新节点属性
+    const updateNodeProperties = () => {
+      if (selectedNode.value && lf.value) {
+        const node = { ...selectedNode.value };
+        lf.value.updateNodeProperties(node.id, node.properties);
+      }
+    };
+
+    // 在组件卸载时移除事件监听
+    onUnmounted(() => {
+      document.removeEventListener('keydown', handleKeyDown);
+    });
+
     return {
       container,
       canUndo,
@@ -567,6 +664,7 @@ export default {
       saveForm,
       onDragStart,
       updateNodeText,
+      updateNodeDescription,
       updateNodeSize,
       updateNodeStyle,
       updateEdgeText,
@@ -583,7 +681,8 @@ export default {
       handleFileChange,
       confirmImport,
       confirmSave,
-      loadFlowData
+      loadFlowData,
+      updateNodeProperties
     };
   }
 };
@@ -612,6 +711,14 @@ export default {
 
 .toolbar-left > * {
   margin-right: 10px;
+}
+
+.action-button {
+  margin-right: 8px;
+}
+
+.button-group {
+  display: flex;
 }
 
 .editor-container {
@@ -693,7 +800,7 @@ export default {
 
 /* 确保图标和文字对齐 */
 .el-button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
