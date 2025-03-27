@@ -3,7 +3,6 @@ import { ref, computed, onMounted } from 'vue';
 import TestCaseList from '@/components/testcase/TestCaseList.vue';
 import TestCaseDetails from '@/components/testcase/TestCaseDetails.vue';
 import TestCaseForm from '@/components/testcase/TestCaseForm.vue';
-import TestCaseFilter from '@/components/testcase/TestCaseFilter.vue';
 
 const activeView = ref('list'); // list, details, create, edit
 const selectedTestCase = ref(null);
@@ -95,10 +94,6 @@ const handleFilterChange = (newFilters) => {
       </div>
     </div>
     
-    <!-- 筛选器 -->
-    <div v-if="activeView === 'list'" class="card mb-6">
-      <TestCaseFilter :filters="filters" @filter-change="handleFilterChange" />
-    </div>
     
     <!-- 加载中 -->
     <div v-if="loading" class="flex items-center justify-center h-64">

@@ -51,6 +51,15 @@ const routes = [
     name: 'Home',
     component: Home
   },
+  {
+    path: '/maintenance',
+    name: 'Maintenance',
+    component: () => import('@/views/maintenance/MaintenanceView.vue'),
+    meta: {
+      title: '系统维护',
+      requiresAuth: true // 需要登录才能访问
+    }
+  },
   // 404 路由应该放在最后
   {
     path: '/:pathMatch(.*)*',
