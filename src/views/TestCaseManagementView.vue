@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import TestCaseList from '@/components/testcase/TestCaseList.vue';
 import TestCaseDetails from '@/components/testcase/TestCaseDetails.vue';
 import TestCaseForm from '@/components/testcase/TestCaseForm.vue';
+import { DataAnalysis, Document } from '@element-plus/icons-vue'; // 添加这行
+
+const router = useRouter();
 
 const activeView = ref('list'); // list, details, create, edit
 const selectedTestCase = ref(null);
@@ -39,7 +43,19 @@ const handleEditTestCase = (testCase) => {
   activeView.value = 'edit';
 };
 
+const createMethodDialogVisible = ref(false);
+
 const handleCreateTestCase = () => {
+  createMethodDialogVisible.value = true;
+};
+
+const handleCreateVisual = () => {
+  createMethodDialogVisible.value = false;
+  router.push('/visual-editor'); // 使用导入的router对象
+};
+
+const handleCreateText = () => {
+  createMethodDialogVisible.value = false;
   selectedTestCase.value = null;
   activeView.value = 'create';
 };
@@ -81,7 +97,35 @@ const handleFilterChange = (newFilters) => {
         </button>
       </div>
       
-      <div v-else>
+      <!-- 创建方式选择对话框 -->
+      <el-dialog
+        v-model="createMethodDialogVisible"
+        title="选择创建方式"
+        width="30%"
+      >
+        <template #default>
+          <div class="create-method-options">
+            <el-button 
+              type="primary" 
+              @click="handleCreateVisual"
+              class="method-button"
+            >
+              <el-icon><DataAnalysis /></el-icon>
+              可视化创建
+            </el-button>
+            <el-button 
+              type="success" 
+              @click="handleCreateText"
+              class="method-button"
+            >
+              <el-icon><Document /></el-icon>
+              文字描述生成
+            </el-button>
+          </div>
+        </template>
+      </el-dialog>
+      
+      <div v-if="activeView !== 'list'">
         <button 
           @click="handleBackToList" 
           class="btn btn-secondary flex items-center"
@@ -170,4 +214,24 @@ const handleFilterChange = (newFilters) => {
 .btn-secondary:hover {
   background-color: #d1d5db;
 }
-</style> 
+
+.create-method-options {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px 0;
+}
+
+.method-button {
+  width: 200px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.method-button .el-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+</style>

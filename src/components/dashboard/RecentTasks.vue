@@ -44,40 +44,40 @@ onMounted(() => {
     tasks.value = [
       { 
         id: 1, 
-        name: '系统更新 - CentOS 8.4', 
-        server: '测试服务器-01', 
+        name: '全量用例回归任务', 
+        server: '李四服务器-01', 
         status: 'completed', 
         startTime: '2025-03-22 03:15:10',
         endTime: '2025-03-22 04:05:32'
       },
       { 
         id: 2, 
-        name: '数据库备份', 
-        server: '数据库服务器-01', 
+        name: '模糊测试任务', 
+        server: '李四服务器-02', 
         status: 'completed', 
         startTime: '2025-03-22 04:00:00',
         endTime: '2025-03-22 04:15:23'
       },
       { 
         id: 3, 
-        name: '安全补丁安装', 
-        server: '生产服务器-02', 
+        name: '撮合模块性能测试任务', 
+        server: '李四服务器-03', 
         status: 'running', 
         startTime: '2025-03-22 05:30:00',
         endTime: null
       },
       { 
         id: 4, 
-        name: '日志清理', 
-        server: '日志服务器-01', 
+        name: '新一代交易系统对比测试', 
+        server: '李四服务器-03', 
         status: 'queued', 
         startTime: null,
         endTime: null
       },
       { 
         id: 5, 
-        name: 'Nginx配置更新', 
-        server: '负载均衡-01', 
+        name: '项目A持续集成任务', 
+        server: '李四服务器-01', 
         status: 'failed', 
         startTime: '2025-03-22 04:25:12',
         endTime: '2025-03-22 04:25:45'
@@ -143,4 +143,4 @@ onMounted(() => {
       <div class="mt-2 text-sm font-medium">暂无任务记录</div>
     </div>
   </div>
-</template> 
+</template>

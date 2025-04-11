@@ -1,11 +1,13 @@
 <script setup lang="ts">
+// 修改组件名
+const componentName = 'CaseExecutionOverview';
 import { ref, onMounted } from 'vue';
 
-// 模拟告警数据
+// 模拟任务数据
 const alerts = ref([]);
 const loading = ref(true);
 
-// 获取告警级别样式
+// 获取任务结果样式
 const getAlertLevelClass = (level) => {
   switch (level) {
     case 'critical':
@@ -19,21 +21,21 @@ const getAlertLevelClass = (level) => {
   }
 };
 
-// 获取告警级别文本
+// 获取任务结果级别文本
 const getAlertLevelText = (level) => {
   switch (level) {
     case 'critical':
-      return '严重';
+      return '未通过';
     case 'warning':
-      return '警告';
+      return '存在警告';
     case 'info':
-      return '信息';
+      return '通过';
     default:
       return '未知';
   }
 };
 
-// 模拟加载告警数据
+// 模拟加载任务数据
 onMounted(() => {
   // 模拟API请求延迟
   setTimeout(() => {
@@ -41,32 +43,32 @@ onMounted(() => {
       { 
         id: 1, 
         level: 'critical', 
-        message: 'CPU使用率超过90%', 
-        server: '生产服务器-02', 
+        message: '客户限仓用例01', 
+        server: '张三服务器-01', 
         timestamp: '2025-03-22 05:28:45',
         acknowledged: false
       },
       { 
         id: 2, 
         level: 'warning', 
-        message: '磁盘使用率超过80%', 
-        server: '数据库服务器-02', 
+        message: '实控组限仓用例03', 
+        server: '张三服务器-01', 
         timestamp: '2025-03-22 04:22:38',
         acknowledged: false
       },
       { 
         id: 3, 
         level: 'warning', 
-        message: '内存使用率超过75%', 
-        server: '测试服务器-02', 
+        message: '实控组限仓用例04', 
+        server: '张三服务器-01', 
         timestamp: '2025-03-22 04:58:11',
         acknowledged: true
       },
       { 
         id: 4, 
         level: 'info', 
-        message: '网络延迟高于平均值', 
-        server: '负载均衡-01', 
+        message: '客户限仓用例02', 
+        server: '张三服务器-02', 
         timestamp: '2025-03-22 04:30:15',
         acknowledged: true
       },
@@ -75,7 +77,7 @@ onMounted(() => {
   }, 800);
 });
 
-// 确认告警
+// 确认任务
 const acknowledgeAlert = (alertId) => {
   const alert = alerts.value.find(a => a.id === alertId);
   if (alert) {
@@ -85,14 +87,14 @@ const acknowledgeAlert = (alertId) => {
 </script>
 
 <template>
-  <div class="system-alerts">
-    <!-- 加载状态 -->
+  <div class="task-execution-overview">
+    <!-- 修改类名和内容 -->
     <div v-if="loading" class="py-4 text-center text-gray-500">
       <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
-      <div>加载告警信息中...</div>
+      <div>加载任务执行结果中...</div>
     </div>
     
-    <!-- 告警列表 -->
+    <!-- 任务列表 -->
     <div v-else-if="alerts.length > 0">
       <ul class="divide-y divide-gray-200">
         <li v-for="alert in alerts" :key="alert.id" class="py-3">
@@ -133,12 +135,18 @@ const acknowledgeAlert = (alertId) => {
       </ul>
     </div>
     
-    <!-- 无告警状态 -->
+    <!-- 无任务状态 -->
     <div v-else class="py-8 text-center text-gray-500">
       <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <div class="mt-2 text-sm font-medium">当前没有系统告警</div>
+      <div class="mt-2 text-sm font-medium">当前没有任务结果</div>
     </div>
   </div>
-</template> 
+</template>
+
+<style scoped>
+.task-execution-overview {
+  /* 修改样式类名 */
+}
+</style>

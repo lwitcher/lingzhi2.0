@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 import * as echarts from 'echarts';
 
 const props = defineProps({
@@ -93,15 +93,17 @@ onMounted(() => {
     
     loading.value = false;
     
-    // 初始化图表
-    initCharts();
+    // 使用nextTick确保DOM更新完成
+    nextTick(() => {
+      initCharts();
+    });
   }, 800);
 });
 
 // 初始化图表
 const initCharts = () => {
   if (!serverInfo.value) return;
-  
+
   // CPU使用率图表
   if (cpuChartContainer.value) {
     cpuChart = echarts.init(cpuChartContainer.value);
@@ -125,7 +127,7 @@ const initCharts = () => {
           },
           axisLine: {
             lineStyle: {
-              width: 18
+              width: 8 // 将线宽从18改为8
             }
           },
           splitLine: {
@@ -177,7 +179,7 @@ const initCharts = () => {
           },
           axisLine: {
             lineStyle: {
-              width: 18
+              width: 8 // 将线宽从18改为8
             }
           },
           splitLine: {
@@ -229,7 +231,7 @@ const initCharts = () => {
           },
           axisLine: {
             lineStyle: {
-              width: 18
+              width: 8 // 将线宽从18改为8
             }
           },
           splitLine: {
@@ -334,7 +336,7 @@ const getServiceStatusClass = (status) => {
           <!-- CPU -->
           <div class="flex flex-col items-center">
             <div class="text-sm font-medium text-gray-700">CPU</div>
-            <div ref="cpuChartContainer" class="w-24 h-24"></div>
+            <div ref="cpuChartContainer" class="w-24 h-24" style="width: 96px; height: 96px;"></div>
             <div class="mt-1 text-sm">
               <span class="font-medium">{{ serverInfo.cpu.usage }}%</span>
               <span class="text-xs text-gray-500 ml-1">{{ serverInfo.cpu.temperature }}°C</span>
@@ -344,7 +346,7 @@ const getServiceStatusClass = (status) => {
           <!-- 内存 -->
           <div class="flex flex-col items-center">
             <div class="text-sm font-medium text-gray-700">内存</div>
-            <div ref="memoryChartContainer" class="w-24 h-24"></div>
+            <div ref="memoryChartContainer" class="w-24 h-24" style="width: 96px; height: 96px;"></div>
             <div class="mt-1 text-sm">
               <span class="font-medium">{{ serverInfo.memory.usage }}%</span>
               <span class="text-xs text-gray-500 ml-1">可用: {{ serverInfo.memory.available }}</span>
@@ -354,7 +356,7 @@ const getServiceStatusClass = (status) => {
           <!-- 磁盘 -->
           <div class="flex flex-col items-center">
             <div class="text-sm font-medium text-gray-700">磁盘</div>
-            <div ref="diskChartContainer" class="w-24 h-24"></div>
+            <div ref="diskChartContainer" class="w-24 h-24" style="width: 96px; height: 96px;"></div>
             <div class="mt-1 text-sm">
               <span class="font-medium">{{ serverInfo.disk.usage }}%</span>
               <span class="text-xs text-gray-500 ml-1">可用: {{ serverInfo.disk.available }}</span>
@@ -459,4 +461,4 @@ const getServiceStatusClass = (status) => {
       </div>
     </div>
   </div>
-</template> 
+</template>

@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import ServerStatusChart from '@/components/server/ServerStatusChart.vue';
 import ServerSummary from '@/components/server/ServerSummary.vue';
-import SystemAlerts from '@/components/dashboard/SystemAlerts.vue';
+import CaseExecutionOverview from '@/components/dashboard/CaseExecutionOverview.vue';
 import RecentTasks from '@/components/dashboard/RecentTasks.vue';
 
 const loading = ref(true);
@@ -30,8 +30,8 @@ onMounted(() => {
           <ServerSummary />
         </div>
         <div class="card">
-          <h2 class="text-lg font-semibold mb-4">系统告警</h2>
-          <SystemAlerts />
+          <h2 class="text-lg font-semibold mb-4">用例执行结果通知</h2>
+          <CaseExecutionOverview />
         </div>
       </div>
       
@@ -41,7 +41,7 @@ onMounted(() => {
       </div>
       
       <div class="card">
-        <h2 class="text-lg font-semibold mb-4">最近任务</h2>
+        <h2 class="text-lg font-semibold mb-4">最近任务状态</h2>
         <RecentTasks />
       </div>
     </div>

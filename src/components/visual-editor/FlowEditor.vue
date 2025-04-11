@@ -304,7 +304,19 @@ export default {
         } 
       }
     ];
-
+    // 监听键盘删除事件
+    const handleKeyDown = (e) => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault(); // 阻止默认的浏览器行为
+        if (selectedNode.value) {
+          lf.value.deleteNode(selectedNode.value.id);
+          selectedNode.value = null;
+        } else if (selectedEdge.value) {
+          lf.value.deleteEdge(selectedEdge.value.id);
+          selectedEdge.value = null;
+        }
+      };
+    };
     // 初始化流程图编辑器
     onMounted(() => {
       // 注册插件
@@ -358,18 +370,15 @@ export default {
         selectedEdge.value = null;
       });
 
-      // 监听键盘删除事件
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Delete' || e.key === 'Backspace') {
-          e.preventDefault(); // 阻止默认的浏览器行为
-          if (selectedNode.value) {
-            lf.value.deleteNode(selectedNode.value.id);
-            selectedNode.value = null;
-          } else if (selectedEdge.value) {
-            lf.value.deleteEdge(selectedEdge.value.id);
-            selectedEdge.value = null;
-          }
-        }
+      
+
+      onMounted(() => {
+        // 修改事件监听，使用定义好的handleKeyDown函数
+        document.addEventListener('keydown', handleKeyDown);
+      });
+
+      onUnmounted(() => {
+        document.removeEventListener('keydown', handleKeyDown);
       });
     });
 
@@ -823,4 +832,4 @@ export default {
 .el-upload-dragger {
   width: 100%;
 }
-</style> 
+</style>
