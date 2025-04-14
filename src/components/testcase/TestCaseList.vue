@@ -4,13 +4,6 @@
       <h2>测试用例库</h2>
       <div class="header-actions">
         <el-button 
-          type="primary" 
-          @click="createTestCase"
-        >
-          <el-icon><Plus /></el-icon>
-          新建测试用例
-        </el-button>
-        <el-button 
           type="success" 
           @click="showImportDialog"
         >
@@ -29,73 +22,93 @@
     </div>
 
     <div class="filter-section">
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <el-input
-            v-model="filterForm.keyword"
-            placeholder="搜索测试用例..."
-            clearable
-            @input="handleFilter"
-          >
-            <template #prefix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
-        </el-col>
-        <el-col :span="5">
-          <el-select 
-            v-model="filterForm.category" 
-            placeholder="分类筛选" 
-            clearable 
-            @change="handleFilter"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="item in categoryOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-col>
-        <el-col :span="5">
-          <el-select 
-            v-model="filterForm.priority" 
-            placeholder="优先级筛选" 
-            clearable 
-            @change="handleFilter"
-            style="width: 100%"
-          >
-            <el-option label="P0 - 阻断性" value="P0" />
-            <el-option label="P1 - 严重" value="P1" />
-            <el-option label="P2 - 一般" value="P2" />
-            <el-option label="P3 - 次要" value="P3" />
-          </el-select>
-        </el-col>
-        <el-col :span="5">
-          <el-select 
-            v-model="filterForm.status" 
-            placeholder="状态筛选" 
-            clearable 
-            @change="handleFilter"
-            style="width: 100%"
-          >
-            <el-option label="活跃" value="active" />
-            <el-option label="已完成" value="completed" />
-            <el-option label="已废弃" value="deprecated" />
-          </el-select>
-        </el-col>
-        <el-col :span="3">
-          <el-button 
-            type="text" 
-            @click="resetFilter"
-          >
-            <el-icon><RefreshRight /></el-icon>
-            重置筛选
-          </el-button>
-        </el-col>
-      </el-row>
-    </div>
+  <el-row :gutter="20">
+    <el-col :span="4">
+      <el-input
+        v-model="filterForm.keyword"
+        placeholder="搜索测试用例..."
+        clearable
+        @input="handleFilter"
+      >
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
+    </el-col>
+    
+    <el-col :span="4">
+      <el-select 
+        v-model="filterForm.category" 
+        placeholder="分类筛选" 
+        @change="handleFilter"
+        style="width: 100%"
+      >
+        <el-option
+          v-for="item in categoryOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+    </el-col>
+    
+    <el-col :span="4">
+      <el-select 
+        v-model="filterForm.module" 
+        placeholder="模块筛选" 
+        @change="handleFilter"
+        style="width: 100%"
+      >
+        <el-option
+          v-for="item in moduleOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+    </el-col>
+    
+    <el-col :span="4">
+      <el-select 
+        v-model="filterForm.businessFunction" 
+        placeholder="业务功能筛选" 
+        @change="handleFilter"
+        style="width: 100%"
+      >
+        <el-option
+          v-for="item in businessFunctionOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+    </el-col>
+    
+    <el-col :span="4">
+      <el-input
+        v-model="filterForm.project"
+        placeholder="搜索引入项目"
+        clearable
+        @input="handleFilter"
+      >
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
+    </el-col>
+    
+    <el-col :span="4">
+      <el-button 
+        type="text" 
+        @click="resetFilter"
+        style="width: 100%"
+      >
+        <el-icon><RefreshRight /></el-icon>
+        重置筛选
+      </el-button>
+    </el-col>
+  </el-row>
+</div>
 
     <el-table
       ref="testCaseTable"
@@ -123,39 +136,36 @@
         </template>
       </el-table-column>
       
-      <el-table-column prop="category" label="分类" width="120">
-        <template #default="scope">
-          <span v-if="scope && scope.row">{{ scope.row?.category || '-' }}</span>
-          <span v-else>-</span>
-        </template>
-      </el-table-column>
+      <el-table-column prop="module" label="模块" width="90">
+  <template #default="scope">
+    <el-tag 
+      v-if="scope && scope.row" 
+      :type="getModuleType(scope.row?.module)" 
+      size="small"
+    >
+      {{ scope.row?.module || '其他' }}
+    </el-tag>
+    <el-tag v-else size="small" type="info">其他</el-tag>
+  </template>
+</el-table-column>
       
-      <el-table-column prop="priority" label="优先级" width="90">
-        <template #default="scope">
-          <el-tag 
-            v-if="scope && scope.row" 
-            :type="getPriorityType(scope.row?.priority)" 
-            size="small"
-          >
-            {{ scope.row?.priority || '普通' }}
-          </el-tag>
-          <el-tag v-else size="small" type="info">普通</el-tag>
-        </template>
-      </el-table-column>
-      
-      <el-table-column prop="status" label="状态" width="90">
-        <template #default="scope">
-          <el-tag 
-            v-if="scope && scope.row" 
-            :type="getStatusType(scope.row?.status)" 
-            size="small"
-          >
-            {{ getStatusText(scope.row?.status) || '未知' }}
-          </el-tag>
-          <el-tag v-else size="small" type="info">未知</el-tag>
-        </template>
-      </el-table-column>
-      
+<el-table-column prop="businessFunction" label="业务功能" width="120">
+  <template #default="scope">
+    <el-tag 
+      v-if="scope && scope.row" 
+      :type="getBusinessFunctionType(scope.row?.businessFunction)" 
+      size="small"
+    >
+      {{ scope.row?.businessFunction || '其他' }}
+    </el-tag>
+    <el-tag v-else size="small" type="info">其他</el-tag>
+  </template>
+</el-table-column>
+<el-table-column prop="project" label="引入项目" width="120">
+  <template #default="scope">
+    {{ scope.row?.project || '-' }}
+  </template>
+</el-table-column>
       <el-table-column prop="lastRunResult" label="上次执行" width="100">
         <template #default="scope">
           <el-tag 
@@ -258,9 +268,14 @@
           <el-descriptions-item label="用例ID">{{ currentTestCase.id }}</el-descriptions-item>
           <el-descriptions-item label="用例名称">{{ currentTestCase.name }}</el-descriptions-item>
           <el-descriptions-item label="分类">{{ currentTestCase.category }}</el-descriptions-item>
-          <el-descriptions-item label="优先级">
-            <el-tag :type="getPriorityType(currentTestCase.priority)">
-              {{ currentTestCase.priority }}
+          <el-descriptions-item label="模块">
+            <el-tag :type="getModuleType(currentTestCase.module)">
+              {{ currentTestCase.module }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="业务功能">
+            <el-tag :type="getBusinessFunctionType(currentTestCase.businessFunction)">
+              {{ currentTestCase.businessFunction }}
             </el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="状态">
@@ -524,11 +539,12 @@ export default {
       
       // 筛选表单
       filterForm: {
-        keyword: '',
-        category: '',
-        priority: '',
-        status: ''
-      },
+      keyword: '',
+      category: 'all',
+      businessFunction: 'all',
+      module: 'all',
+      project: '' 
+    },
       
       // 分页配置
       pagination: {
@@ -558,13 +574,31 @@ export default {
       
       // 分类选项
       categoryOptions: [
+        { value: 'all', label: '全部分类' },
         { value: '功能测试', label: '功能测试' },
         { value: '性能测试', label: '性能测试' },
         { value: '接口测试', label: '接口测试' },
         { value: '安全测试', label: '安全测试' },
-        { value: '兼容性测试', label: '兼容性测试' },
+        { value: '对比测试', label: '对比测试' },
         { value: '回归测试', label: '回归测试' }
-      ]
+      ],
+      // 模块选项
+    moduleOptions: [
+      { value: 'all', label: '全部模块' },
+      { value: '撮合', label: '撮合' },
+      { value: '风控', label: '风控' },
+      { value: '行情', label: '行情' },
+      { value: '网关', label: '网关' },
+      { value: '其他', label: '其他' }
+    ],
+    businessFunctionOptions: [ // 添加业务功能选项
+      { value: 'all', label: '全部业务功能' },
+      { value: 'TAS', label: 'TAS' },
+      { value: '集合竞价撮合', label: '集合竞价撮合' },
+      { value: '持仓风控', label: '持仓风控' },
+      { value: '资金风控', label: '资金风控' },
+      { value: '行情', label: '行情' }
+    ],
     };
   },
   computed: {
@@ -589,11 +623,38 @@ export default {
     
     // 如果有传入的筛选器，则应用它们
     if (this.filters) {
-      this.filterForm = { ...this.filters };
+      this.filterForm = { ...{
+      keyword: '',
+      category: 'all',
+      businessFunction: 'all',
+      module: 'all',
+      status: ''
+    },
+    ...this.filters };
       this.handleFilter();
     }
   },
   methods: {
+    getBusinessFunctionType(businessFunction) {
+    const map = {
+      'TAS': 'success',
+      '集合竞价撮合': 'warning',
+      '持仓风控': 'primary',
+      '资金风控': 'info',
+      '行情': 'danger'
+    };
+    return map[businessFunction] || 'info';
+  },
+    getModuleType(module) {
+    const map = {
+      '撮合': 'success',
+      '风控': 'warning',
+      '行情': 'primary',
+      '网关': 'info',
+      '其他': 'danger'
+    };
+    return map[module] || 'info';
+  },
     /**
      * 获取测试用例数据
      */
@@ -604,17 +665,21 @@ export default {
         // 生成测试数据
         this.testCases = Array.from({ length: 53 }, (_, i) => {
           const id = `TC-${1000 + i}`;
-          const priority = ['P0', 'P1', 'P2', 'P3', 'P4'][Math.floor(Math.random() * 5)];
-          const status = ['active', 'inactive', 'draft', 'deprecated'][Math.floor(Math.random() * 4)];
-          const category = this.categoryOptions[Math.floor(Math.random() * this.categoryOptions.length)].value;
+          const validCategories = this.categoryOptions.filter(opt => opt.value !== 'all');
+          const validBusinessFunctions = this.businessFunctionOptions.filter(opt => opt.value !== 'all');
+          const validModules = this.moduleOptions.filter(opt => opt.value!== 'all');
+          const category = validCategories[Math.floor(Math.random() * validCategories.length)].value;
+          const businessFunction = validBusinessFunctions[Math.floor(Math.random() * validBusinessFunctions.length)].value;
           const lastRunResult = Math.random() > 0.3 ? ['通过', '失败', '阻塞', '跳过'][Math.floor(Math.random() * 4)] : null;
+          const module = validModules[Math.floor(Math.random() * validModules.length)].value;
           
           return {
             id,
-            name: `测试用例 ${id} - ${['登录功能', '注册功能', '搜索功能', '支付功能', '退款功能'][Math.floor(Math.random() * 5)]}`,
+            name: `${id} - ${['下单功能', '持仓风控功能', '资金风控功能', '委托回报功能', '行情发送功能'][Math.floor(Math.random() * 5)]}`,
+            module,
+            businessFunction,
             description: `这是测试用例 ${id} 的详细描述，用于测试系统功能是否正常运行。`,
-            priority,
-            status,
+            project: ['期权结算价优化', 'TAS', '新一代交易系统'][Math.floor(Math.random() * 3)],
             category,
             creator: ['张三', '李四', '王五', '赵六'][Math.floor(Math.random() * 4)],
             createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toLocaleString(),
@@ -648,38 +713,43 @@ export default {
     /**
      * 应用筛选条件
      */
-    applyFilters() {
-      const { keyword, category, priority, status } = this.filterForm;
+     applyFilters() {
+      const { keyword, category, module, businessFunction, project } = this.filterForm;
+    
+    this.filteredTestCases = this.testCases.filter(item => {
+      // 关键字搜索
+      if (keyword && !item.name.includes(keyword) && 
+          !item.id.includes(keyword) && 
+          !(item.description && item.description.includes(keyword))) {
+        return false;
+      }
+
+      //模块筛选
+      if (module && module !== 'all' && item.module !== module) {
+      return false;
+    }
       
-      this.filteredTestCases = this.testCases.filter(item => {
-        // 关键字搜索
-        if (keyword && !item.name.includes(keyword) && 
-            !item.id.includes(keyword) && 
-            !(item.description && item.description.includes(keyword))) {
-          return false;
-        }
-        
-        // 分类筛选
-        if (category && item.category !== category) {
-          return false;
-        }
-        
-        // 优先级筛选
-        if (priority && item.priority !== priority) {
-          return false;
-        }
-        
-        // 状态筛选
-        if (status && item.status !== status) {
-          return false;
-        }
-        
-        return true;
-      });
+      // 分类筛选
+      if (category && category !== 'all' && item.category !== category) {
+        return false;
+      }
       
-      // 更新分页总数
-      this.pagination.total = this.filteredTestCases.length;
-    },
+      // 业务功能筛选
+      if (businessFunction && businessFunction !== 'all' && item.businessFunction !== businessFunction) {
+        return false;
+      }
+      
+      // 项目筛选
+    if (project && !item.project.includes(project)) {
+      return false;
+    }
+      
+      return true;
+    });
+    
+    // 更新分页总数
+    this.pagination.total = this.filteredTestCases.length;
+  },
     
     /**
      * 处理筛选条件变化
@@ -695,8 +765,9 @@ export default {
     resetFilter() {
       this.filterForm = {
         keyword: '',
-        category: '',
-        priority: '',
+        category: 'all',
+        businessFunction: 'all',
+        module: 'all',
         status: ''
       };
       this.pagination.currentPage = 1;
@@ -844,19 +915,6 @@ export default {
       }, 1000);
     },
     
-    /**
-     * 获取优先级对应的类型
-     */
-    getPriorityType(priority) {
-      const map = {
-        'P0': 'danger',
-        'P1': 'warning',
-        'P2': 'primary',
-        'P3': 'info',
-        'P4': 'success'
-      };
-      return map[priority] || 'info';
-    },
     
     /**
      * 获取状态对应的类型
@@ -991,7 +1049,6 @@ export default {
           id: 10000 + this.testCases.length + i,
           name: `导入的测试用例 ${i + 1}`,
           category: this.categoryOptions[Math.floor(Math.random() * this.categoryOptions.length)].value,
-          priority: ['P0', 'P1', 'P2', 'P3'][Math.floor(Math.random() * 4)],
           status: 'active',
           description: '这是从文件导入的测试用例',
           creator: '系统导入',
