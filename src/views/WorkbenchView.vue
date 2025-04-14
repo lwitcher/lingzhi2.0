@@ -11,7 +11,10 @@ import {
   DataLine,
   Upload,
   Monitor,
-  Document
+  Document,
+  Lock,
+  Notification,
+  Warning
 } from '@element-plus/icons-vue'
 
 const selectedServer = ref(null);
@@ -29,9 +32,10 @@ const deployConfig = ref({
   multicast: '239.255.0.1:5000'
 })
 
+const quickActionCollapsed = ref(false);
+
 // 添加卡片折叠状态控制变量
 const serverCardCollapsed = ref(false);
-const processCardCollapsed = ref(false);
 
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
@@ -51,10 +55,6 @@ const servers = ref([
 ]);
 
 const dialogType = ref('');
-const processList = ref([
-  { pid: 1234, name: 'nginx', cpu: 12.5, memory: 45.2 },
-  { pid: 5678, name: 'node', cpu: 23.1, memory: 67.8 }
-]);
 
 const tools = ref([]);
 
@@ -62,8 +62,6 @@ const openDialog = (action) => {
   dialogType.value = action;
   dialogTitle.value = {
     'restart': '服务器重启',
-    'monitor': '进程监控',
-    'logs': '日志分析',
     'toolchain': '一键部署工具链',
     'process': '进程管理'
   }[action];
@@ -164,34 +162,39 @@ const openDialog = (action) => {
           </el-button>
         </div>
       </el-card>
-
       <el-card shadow="hover" class="w-full">
-        <template #header>
-          <div class="flex justify-between items-center">
-            <h3 class="font-medium">进程管理</h3>
-            <el-button 
-              type="primary"
-              size="small"
-              circle
-              @click="processCardCollapsed = !processCardCollapsed"
-              class="collapse-btn"
-            >
-              <i-ep-arrow-up v-if="!processCardCollapsed" />
-              <i-ep-arrow-down v-else />
-            </el-button>
-          </div>
-        </template>
-        <div v-show="!processCardCollapsed" class="grid grid-cols-2 gap-3">
-          <el-button type="primary" @click="openDialog('monitor')">
-            <template #icon><i-ep-monitor /></template>
-            进程监控
-          </el-button>
-          <el-button type="primary" @click="openDialog('logs')">
-            <template #icon><i-ep-document /></template>
-            日志分析
-          </el-button>
-        </div>
-      </el-card>
+  <template #header>
+    <div class="flex justify-between items-center">
+      <h3 class="font-medium">交易系统快捷操作</h3>
+      <el-button 
+        type="primary"
+        size="small"
+        :icon="quickActionCollapsed ? ArrowDown : ArrowUp"
+        @click="quickActionCollapsed = !quickActionCollapsed"
+        class="collapse-btn"
+        text
+      />
+    </div>
+  </template>
+  <div v-show="!quickActionCollapsed" class="grid grid-cols-6 gap-3">
+    <el-button type="warning" @click="">
+      <template #icon><el-icon><Lock /></el-icon></template>
+      禁用CA
+    </el-button>
+    <el-button type="success" @click="">
+      <template #icon><el-icon><Notification /></el-icon></template>
+      一键开市
+    </el-button>
+    <el-button type="danger" @click="">
+      <template #icon><el-icon><Refresh /></el-icon></template>
+      重启交易系统
+    </el-button>
+    <el-button type="info" @click="">
+      <template #icon><el-icon><Warning /></el-icon></template>
+      确认反演状态
+    </el-button>
+  </div>
+</el-card>
       <!-- 终端输出 -->
       <el-card shadow="hover">
         <template #header>
