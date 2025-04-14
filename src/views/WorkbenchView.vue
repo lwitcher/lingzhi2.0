@@ -2,6 +2,17 @@
 import { ref } from 'vue';
 import ServerDetails from '@/components/server/ServerDetails.vue';
 import { ElMessage } from 'element-plus';
+import { ArrowUp, ArrowDown } from '@element-plus/icons-vue'
+import {
+  Refresh,
+  Setting,
+  Tools,
+  Cpu,
+  DataLine,
+  Upload,
+  Monitor,
+  Document
+} from '@element-plus/icons-vue'
 
 const selectedServer = ref(null);
 const terminalLogs = ref([
@@ -10,6 +21,10 @@ const terminalLogs = ref([
   '[2025-03-22 09:00:02] 正在同步系统状态...',
   '[2025-03-22 09:00:05] 系统状态同步完成'
 ]);
+
+// 添加卡片折叠状态控制变量
+const serverCardCollapsed = ref(false);
+const processCardCollapsed = ref(false);
 
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
@@ -138,49 +153,71 @@ const openDialog = (action) => {
 
 <template>
   <div class="workbench-container">
-    <div class="grid grid-cols-1 gap-4"> <!-- 修改为单列布局 -->
+    <div class="grid grid-cols-1 gap-4">
       <!-- 功能操作区 -->
-      <el-card shadow="hover" class="w-full"> <!-- 添加 w-full 类 -->
+      <el-card shadow="hover" class="w-full">
         <template #header>
-          <h3 class="font-medium">服务器管理</h3>
+          <div class="flex justify-between items-center">
+            <h3 class="font-medium">服务器管理</h3>
+            <el-button 
+              type="primary"
+              size="small"
+              :icon="serverCardCollapsed ? ArrowDown : ArrowUp"
+              @click="serverCardCollapsed = !serverCardCollapsed"
+              class="collapse-btn"
+              text
+            />
+          </div>
         </template>
-        <div class="grid grid-cols-2 gap-3">
+        <div v-show="!serverCardCollapsed" class="grid grid-cols-5 gap-3">
           <el-button type="primary" @click="openDialog('restart')">
-            <template #icon><i-ep-refresh /></template>
+            <template #icon><el-icon><Refresh /></el-icon></template>
             服务重启
           </el-button>
           <el-button type="primary" @click="openDialog('update')">
-            <template #icon><i-ep-setting /></template>
+            <template #icon><el-icon><Setting /></el-icon></template>
             配置更新
           </el-button>
           <el-button type="primary" @click="openDialog('settings')">
-            <template #icon><i-ep-tools /></template>
+            <template #icon><el-icon><Tools /></el-icon></template>
             服务器设置
           </el-button>
           <el-button type="primary" @click="openDialog('toolchain')">
-            <template #icon><i-ep-cpu /></template>
+            <template #icon><el-icon><Cpu /></el-icon></template>
             工具链部署
           </el-button>
           <el-button type="primary" @click="openDialog('deploy')">
-            <template #icon><i-ep-data-line /></template>
+            <template #icon><el-icon><DataLine /></el-icon></template>
             系统部署
           </el-button>
           <el-button type="primary" @click="openDialog('files')">
-            <template #icon><i-ep-upload /></template>
+            <template #icon><el-icon><Upload /></el-icon></template>
             文件传输
           </el-button>
           <el-button type="primary" @click="openDialog('process')">
-            <template #icon><i-ep-cpu /></template>
+            <template #icon><el-icon><Cpu /></el-icon></template>
             进程管理
           </el-button>
         </div>
       </el-card>
 
-      <el-card shadow="hover" class="w-full"> <!-- 添加 w-full 类 -->
+      <el-card shadow="hover" class="w-full">
         <template #header>
-          <h3 class="font-medium">进程管理</h3>
+          <div class="flex justify-between items-center">
+            <h3 class="font-medium">进程管理</h3>
+            <el-button 
+              type="primary"
+              size="small"
+              circle
+              @click="processCardCollapsed = !processCardCollapsed"
+              class="collapse-btn"
+            >
+              <i-ep-arrow-up v-if="!processCardCollapsed" />
+              <i-ep-arrow-down v-else />
+            </el-button>
+          </div>
         </template>
-        <div class="grid grid-cols-2 gap-3">
+        <div v-show="!processCardCollapsed" class="grid grid-cols-2 gap-3">
           <el-button type="primary" @click="openDialog('monitor')">
             <template #icon><i-ep-monitor /></template>
             进程监控
@@ -305,5 +342,24 @@ const openDialog = (action) => {
 /* 调整卡片间距 */
 .el-card {
   @apply p-2 mb-4; /* 添加底部间距 */
+}
+
+/* 修改折叠按钮样式 */
+.el-card .flex .el-button.collapse-btn {
+  width: auto;
+  height: auto;
+  padding: 4px;
+  background: transparent !important;
+  border: none !important;
+  color: var(--el-color-primary);
+}
+
+.el-card .flex .el-button.collapse-btn:hover {
+  transform: none;
+  color: var(--el-color-primary-light-3);
+}
+.el-card .flex .el-button.collapse-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 </style>
