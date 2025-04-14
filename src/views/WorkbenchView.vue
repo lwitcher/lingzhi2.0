@@ -22,6 +22,13 @@ const terminalLogs = ref([
   '[2025-03-22 09:00:05] 系统状态同步完成'
 ]);
 
+const deployConfig = ref({
+  path: '/opt/trading-system',
+  repository: 'https://github.com/example/trading-system.git',
+  branch: 'main',
+  multicast: '239.255.0.1:5000'
+})
+
 // 添加卡片折叠状态控制变量
 const serverCardCollapsed = ref(false);
 const processCardCollapsed = ref(false);
@@ -55,32 +62,13 @@ const openDialog = (action) => {
   dialogType.value = action;
   dialogTitle.value = {
     'restart': '服务器重启',
-    'update': '配置更新',
     'monitor': '进程监控',
     'logs': '日志分析',
-    'settings': '服务器设置',
     'toolchain': '一键部署工具链',
-    'deploy': '一键部署交易系统',
-    'files': '文件上传下载',
     'process': '进程管理'
   }[action];
   
   dialogContent.value = {
-    'settings': `
-      <div class="space-y-4">
-        <el-form label-width="120px">
-          <el-form-item label="服务器名称">
-            <el-input placeholder="输入服务器名称" />
-          </el-form-item>
-          <el-form-item label="IP地址">
-            <el-input placeholder="输入服务器IP" />
-          </el-form-item>
-          <el-form-item label="SSH端口">
-            <el-input-number :min="1" :max="65535" />
-          </el-form-item>
-        </el-form>
-      </div>
-    `,
     'toolchain': `
       <div class="space-y-4">
         <el-checkbox-group v-model="tools">
@@ -91,33 +79,6 @@ const openDialog = (action) => {
         </el-checkbox-group>
         <el-divider />
         <el-button type="primary" plain>开始部署</el-button>
-      </div>
-    `,
-    'deploy': `
-      <div class="space-y-4">
-        <el-select placeholder="选择交易系统版本" class="w-full">
-          <el-option label="交易系统 v2.5.0" value="2.5.0" />
-          <el-option label="交易系统 v2.4.3" value="2.4.3" />
-        </el-select>
-        <el-checkbox>包含示例数据</el-checkbox>
-        <el-checkbox>自动配置数据库</el-checkbox>
-        <el-divider />
-        <el-button type="primary" plain>开始部署</el-button>
-      </div>
-    `,
-    'files': `
-      <div class="space-y-4">
-        <el-upload
-          class="upload-demo"
-          drag
-          action="https://your-upload-url"
-          multiple
-        >
-          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-          <div class="el-upload__text">拖拽文件到此处或<em>点击上传</em></div>
-        </el-upload>
-        <el-divider />
-        <el-button type="primary" plain>下载选中文件</el-button>
       </div>
     `,
     'process': `
@@ -184,14 +145,6 @@ const openDialog = (action) => {
           <el-button type="primary" @click="openDialog('restart')">
             <template #icon><el-icon><Refresh /></el-icon></template>
             服务器重启
-          </el-button>
-          <el-button type="primary" @click="openDialog('update')">
-            <template #icon><el-icon><Setting /></el-icon></template>
-            配置更新
-          </el-button>
-          <el-button type="primary" @click="openDialog('settings')">
-            <template #icon><el-icon><Tools /></el-icon></template>
-            服务器设置
           </el-button>
           <el-button type="primary" @click="openDialog('toolchain')">
             <template #icon><el-icon><Cpu /></el-icon></template>
@@ -283,29 +236,68 @@ const openDialog = (action) => {
       :title="dialogTitle"
       width="50%"
     >
-      <!-- 服务器设置 -->
-      <div v-if="dialogType === 'settings'">
-        <el-form label-width="120px">
-          <el-form-item label="服务器名称">
-            <el-input placeholder="输入服务器名称" />
-          </el-form-item>
-          <el-form-item label="IP地址">
-            <el-input placeholder="输入服务器IP" />
-          </el-form-item>
-          <el-form-item label="SSH端口">
-            <el-input-number :min="1" :max="65535" />
-          </el-form-item>
-        </el-form>
-      </div>
-
       <!-- 工具链部署 -->
-      <div v-else-if="dialogType === 'toolchain'">
+      <div v-if="dialogType === 'toolchain'">
         <el-checkbox-group v-model="tools">
           <el-checkbox label="JDK 17" />
           <el-checkbox label="Python 3.9" />
           <el-checkbox label="Node.js 18" />
           <el-checkbox label="Docker" />
         </el-checkbox-group>
+      </div>
+
+      <!-- 文件传输 -->
+      <div v-else-if="dialogType === 'files'">
+        <div class="space-y-4">
+          <el-upload
+            class="upload-demo"
+            drag
+            action="https://your-upload-url"
+            multiple
+          >
+            <el-icon class="el-icon--upload"><Upload /></el-icon>
+            <div class="el-upload__text">拖拽文件到此处或<em>点击上传</em></div>
+          </el-upload>
+          <el-divider />
+          <el-button type="primary" plain class="w-full">下载选中文件</el-button>
+        </div>
+      </div>
+
+      <div v-else-if="dialogType === 'deploy'">
+        <el-form label-width="120px" class="space-y-4">
+          <el-form-item label="部署路径">
+            <el-input v-model="deployConfig.path" placeholder="输入部署绝对路径" />
+          </el-form-item>
+          <el-form-item label="仓库地址">
+            <el-select v-model="deployConfig.repository" class="w-full">
+              <el-option 
+                label="生产仓库 (github.com/example/trading-system)"
+                value="https://github.com/example/trading-system.git"
+              />
+              <el-option
+                label="测试仓库 (gitlab.com/test/trading-system)"
+                value="https://gitlab.com/test/trading-system.git"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="代码分支">
+            <el-select v-model="deployConfig.branch" class="w-full">
+              <el-option label="主干分支 (main)" value="main" />
+              <el-option label="发布分支 (release)" value="release" />
+              <el-option label="开发分支 (dev)" value="dev" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="组播地址">
+            <el-input v-model="deployConfig.multicast" placeholder="239.255.0.1:5000">
+              <template #append>
+                <el-button @click="deployConfig.multicast = '239.255.0.1:5000'">
+                  重置默认
+                </el-button>
+              </template>
+            </el-input>
+          </el-form-item>
+        </el-form>
+        <el-divider />
       </div>
 
       <!-- 进程管理 -->
