@@ -57,6 +57,11 @@ const menuItems = [
     icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />'
   },
   {
+    name: '工作台',
+    route: '/workbench',
+    icon: '<path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm3 10v2h2v-2H7Zm4 0v2h2v-2h-2Zm4 0v2h2v-2h-2Zm-8-4v2h2v-2H7Zm4 0v2h2v-2h-2Zm4 0v2h2v-2h-2ZM7 7v2h2V7H7Zm4 0v2h2V7h-2Zm4 0v2h2V7h-2Z"/>'
+  },
+  {
     name: '服务器管理',
     route: '/servers',
     icon: '<path stroke-linecap="round" route-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />'
@@ -242,6 +247,27 @@ const isActive = (path) => {
       <div class="md:hidden" :class="{ 'block': mobileMenuOpen, 'hidden': !mobileMenuOpen }">
         <div class="bg-white shadow-md">
           <div class="pt-2 pb-3 space-y-1">
+            <router-link
+              to="/workbench"
+              :class="[
+                isActive('/workbench') 
+                  ? 'bg-blue-50 border-blue-500 text-blue-700' 
+                  : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+                'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+              ]"
+              @click="closeMobileMenu"
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                class="h-5 w-5 mr-3 inline-block" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm3 10v2h2v-2H7Zm4 0v2h2v-2h-2Zm4 0v2h2v-2h-2Zm-8-4v2h2v-2H7Zm4 0v2h2v-2h-2Zm4 0v2h2v-2h-2ZM7 7v2h2V7H7Zm4 0v2h2V7h-2Zm4 0v2h2V7h-2Z"/>
+              </svg>
+              工作台
+            </router-link>
             <router-link 
               v-for="item in menuItems" 
               :key="item.route" 

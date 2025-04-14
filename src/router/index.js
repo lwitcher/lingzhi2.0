@@ -8,6 +8,7 @@ import About from '../views/AboutView.vue'
 import MonitoringDashboard from '../views/MonitoringDashboard.vue'
 import VisualEditor from '../views/VisualEditorView.vue'
 import JobManagement from '../views/JobManagementView.vue'
+import Workbench from '../views/WorkbenchView.vue'
 
 const routes = [
   {
@@ -50,6 +51,10 @@ const routes = [
     path: '/login',
     name: 'Home',
     component: Home
+  },{
+    path: '/workbench',
+    name: 'workbench',
+    component: Workbench
   },
   {
     path: '/maintenance',

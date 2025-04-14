@@ -38,6 +38,11 @@ const router = createRouter({
       component: () => import('../views/JobManagementView.vue')
     },
     {
+      path: '/workbench',
+      name: 'workbench',
+      component: () => import('@/views/WorkbenchView.vue')
+    },
+    {
       path: '/text-description',
       component: () => import('@/views/TextDescriptionView.vue')
     }
