@@ -30,6 +30,13 @@ const dialogVisible = ref(false);
 const dialogTitle = ref('');
 const dialogContent = ref('');
 
+const serverConfigVisible = ref(false)
+const serverConfigForm = ref({
+  ip: '',
+  username: '',
+  password: ''
+})
+
 const servers = ref([
   { id: 1, name: '生产服务器-01', status: 'online' },
   { id: 2, name: '测试服务器-01', status: 'online' },
@@ -169,10 +176,14 @@ const openDialog = (action) => {
             />
           </div>
         </template>
-        <div v-show="!serverCardCollapsed" class="grid grid-cols-5 gap-3">
+        <div v-show="!serverCardCollapsed" class="grid grid-cols-6 gap-3">
+          <el-button type="success" @click="serverConfigVisible = true">
+            <template #icon><el-icon><Tools /></el-icon></template>
+            功能设置
+          </el-button>
           <el-button type="primary" @click="openDialog('restart')">
             <template #icon><el-icon><Refresh /></el-icon></template>
-            服务重启
+            服务器重启
           </el-button>
           <el-button type="primary" @click="openDialog('update')">
             <template #icon><el-icon><Setting /></el-icon></template>
@@ -238,7 +249,34 @@ const openDialog = (action) => {
         </pre>
       </el-card>
     </div>
-
+    <el-dialog
+      v-model="serverConfigVisible"
+      title="服务器连接配置"
+      width="500px"
+    >
+    <el-form label-width="80px">
+        <el-form-item label="IP地址">
+          <el-input v-model="serverConfigForm.ip" placeholder="输入服务器IP" />
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input v-model="serverConfigForm.username" placeholder="输入用户名" />
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input 
+            v-model="serverConfigForm.password" 
+            type="password" 
+            placeholder="输入密码"
+            show-password
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="serverConfigVisible = false">取消</el-button>
+        <el-button type="success" @click="serverConfigVisible = false">
+          保存配置
+        </el-button>
+      </template>
+  </el-dialog>
     <!-- 功能弹窗 -->
     <el-dialog
       v-model="dialogVisible"
