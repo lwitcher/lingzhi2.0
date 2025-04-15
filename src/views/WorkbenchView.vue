@@ -17,12 +17,25 @@ import {
   Warning
 } from '@element-plus/icons-vue'
 
+interface Process {
+  pid: number;
+  name: string;
+  cpu: number;
+  memory: number;
+}
+
 const selectedServer = ref(null);
 const terminalLogs = ref([
   '',
   '[2025-03-22 09:00:00] 已连接到服务器 cluster-node-01',
   '[2025-03-22 09:00:02] 正在同步系统状态...',
   '[2025-03-22 09:00:05] 系统状态同步完成'
+]);
+
+const processList = ref<Process[]>([
+  { pid: 1024, name: 'nginx', cpu: 12.5, memory: 32.4 },
+  { pid: 2048, name: 'mysql', cpu: 8.7, memory: 45.2 },
+  { pid: 3072, name: 'node', cpu: 15.3, memory: 28.1 }
 ]);
 
 const deployConfig = ref({
@@ -58,12 +71,14 @@ const dialogType = ref('');
 
 const tools = ref([]);
 
-const openDialog = (action) => {
+const openDialog = (action: 'restart' | 'toolchain' | 'process' | 'deploy' | 'files') => {
   dialogType.value = action;
   dialogTitle.value = {
     'restart': '服务器重启',
     'toolchain': '一键部署工具链',
-    'process': '进程管理'
+    'process': '进程管理',  
+    'deploy': '系统部署',
+    'files': '文件传输'
   }[action];
   
   dialogContent.value = {
