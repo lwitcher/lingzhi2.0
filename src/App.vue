@@ -41,10 +41,9 @@ const closeMobileMenu = () => {
 };
 
 const toggleUserMenu = (event: MouseEvent) => {
-  if (event.target && !(event.target as Element).closest('.user-menu-container')) {
-    event.stopPropagation();
-    userMenuOpen.value = !userMenuOpen.value;
-  };
+  // 移除冲突的条件判断
+  userMenuOpen.value = !userMenuOpen.value;
+  event.stopPropagation(); // 阻止事件冒泡
 };
 
 const handleLogout = () => {
@@ -224,7 +223,7 @@ const isActive = (path: string) => {
                     class="bg-gray-100 rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     <span class="sr-only">用户菜单</span>
-                    <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户头像" />
+                    <img class="h-8 w-8 rounded-full" src="/images/admin-avatar.png" alt="用户头像" />
                   </button>
                 </div>
                 
