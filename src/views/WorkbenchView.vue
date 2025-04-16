@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import ServerDetails from '@/components/server/ServerDetails.vue';
 import { ElMessage } from 'element-plus';
 import { ArrowUp, ArrowDown } from '@element-plus/icons-vue'
+import * as echarts from 'echarts';
 import {
   Refresh,
   Setting,
@@ -16,6 +17,7 @@ import {
   Notification,
   Warning
 } from '@element-plus/icons-vue'
+import { onMounted,onUnmounted } from 'vue';
 
 interface Process {
   pid: number;
@@ -23,6 +25,9 @@ interface Process {
   cpu: number;
   memory: number;
 }
+
+const chartContainer = ref<HTMLElement | null>(null);
+const chartInstance = ref<echarts.ECharts | null>(null);
 
 const selectedServer = ref<any>(null);
 const terminalLogs = ref<string[]>([
@@ -151,6 +156,79 @@ const openDialog = (action: 'restart' | 'toolchain' | 'process' | 'deploy' | 'fi
   
   dialogVisible.value = true;
 };
+
+const generateMockOrderData = () => {
+  const now = new Date();
+  const data = [];
+  for (let i = 4; i >= 0; i--) {
+    const time = new Date(now.getTime() - i * 60 * 1000);
+    data.push({
+      time: `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`,
+      count: Math.floor(Math.random() * 1000) + 500 // 500-1500之间的随机数
+    });
+  }
+  return data;
+};
+
+// 初始化图表
+const initChart = () => {
+  if (chartContainer.value) {
+    chartInstance.value = echarts.init(chartContainer.value);
+    updateChart();
+  }
+};
+
+// 更新图表数据
+const updateChart = () => {
+  if (!chartInstance.value) return;
+  
+  const data = generateMockOrderData();
+  
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      formatter: '{b}<br/>{a}: {c} 笔'
+    },
+    xAxis: {
+      type: 'category',
+      data: data.map(d => d.time)
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: '{value} 笔'
+      }
+    },
+    series: [{
+      name: '委托数量',
+      type: 'line',
+      data: data.map(d => d.count),
+      smooth: true,
+      lineStyle: {
+        width: 3,
+        color: '#3B82F6'
+      },
+      itemStyle: {
+        color: '#3B82F6'
+      }
+    }]
+  };
+  
+  chartInstance.value.setOption(option);
+};
+
+
+
+onMounted(() => {
+  initChart();
+  window.addEventListener('resize', () => {
+    chartInstance.value?.resize();
+  });
+});
+
+onUnmounted(() => {
+  chartInstance.value?.dispose();
+});
 </script>
 
 <template>
@@ -240,6 +318,12 @@ const openDialog = (action: 'restart' | 'toolchain' | 'process' | 'deploy' | 'fi
           {{ terminalLogs.join('\n') }}
         </pre>
       </el-card>
+      <el-card shadow="hover">
+    <template #header>
+      <h2 class="text-lg font-semibold">委托数量趋势（最近5分钟）</h2>
+    </template>
+    <div ref="chartContainer" class="h-80"></div>
+  </el-card>
     </div>
     <el-dialog
       v-model="serverConfigVisible"
@@ -430,5 +514,8 @@ const openDialog = (action: 'restart' | 'toolchain' | 'process' | 'deploy' | 'fi
 .el-card .flex .el-button.collapse-btn:hover {
   transform: scale(1.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.h-80 {
+  height: 20rem;
 }
 </style>

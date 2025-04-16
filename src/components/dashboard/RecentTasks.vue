@@ -19,12 +19,14 @@ const loading = ref(true);
 // 获取任务状态样式
 const getTaskStatusClass = (status: Task['status']) => {
   switch (status) {
-    case 'online':
-      return 'bg-green-100 text-green-800';
+    case 'complete':
+      return 'bg-blue-100 text-green-800';
     case 'warning':
       return 'bg-yellow-100 text-yellow-800';
-    case 'offline':
+    case 'failed':
       return 'bg-red-100 text-red-800';
+    case 'running':
+      return 'bg-green-100 text-green-800'
     default:
       return 'bg-gray-100 text-gray-800';
   }
@@ -33,12 +35,14 @@ const getTaskStatusClass = (status: Task['status']) => {
 // 获取任务状态文本
 const getTaskStatusText = (status: ServiceStatus) => {
   switch (status) {
-    case 'online':
-      return '在线';
+    case 'complete':
+      return '完成';
     case 'warning':
       return '告警';
-    case 'offline':
-      return '离线';
+    case 'failed':
+      return '出错';
+    case 'running':
+        return '运行中';
     default:
       return '未知';
   }
@@ -53,7 +57,7 @@ onMounted(() => {
         id: 1, 
         name: '全量用例回归任务', 
         server: '李四服务器-01', 
-        status: 'online', 
+        status: 'complete', 
         startTime: '2025-03-22 03:15:10',
         endTime: '2025-03-22 04:05:32'
       },
@@ -61,7 +65,7 @@ onMounted(() => {
         id: 2, 
         name: '模糊测试任务', 
         server: '李四服务器-02', 
-        status: 'online', 
+        status: 'complete', 
         startTime: '2025-03-22 04:00:00',
         endTime: '2025-03-22 04:15:23'
       },
@@ -77,15 +81,15 @@ onMounted(() => {
         id: 4, 
         name: '新一代交易系统对比测试', 
         server: '李四服务器-03', 
-        status: 'warning', 
-        startTime: null,
+        status: 'running', 
+        startTime: '2025-03-22 14:15:22',
         endTime: null
       },
       { 
         id: 5, 
         name: '项目A持续集成任务', 
         server: '李四服务器-01', 
-        status: 'offline', 
+        status: 'failed', 
         startTime: '2025-03-22 04:25:12',
         endTime: '2025-03-22 04:25:45'
       },

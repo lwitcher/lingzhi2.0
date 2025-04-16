@@ -1,4 +1,4 @@
-export type ServiceStatus = 'online' | 'warning' | 'offline' | 'running';
+export type ServiceStatus = 'complete' | 'warning' | 'failed' | 'running';
 
 export interface CaseStat {
   id: string;

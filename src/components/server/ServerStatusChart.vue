@@ -9,7 +9,7 @@ const props = defineProps({
   },
   timeRange: {
     type: String,
-    default: '24h'
+    default: '12h'
   }
 });
 
@@ -32,6 +32,10 @@ const generateMockData = () => {
       points = 6;
       step = 60 * 60 * 1000; // 1小时
       break;
+      case '12h': // 新增12小时处理
+      points = 12;
+      step = 60 * 60 * 1000;
+      break;
     case '24h':
       points = 24;
       step = 60 * 60 * 1000; // 1小时
@@ -53,7 +57,8 @@ const generateMockData = () => {
     if (props.timeRange === '7d' || props.timeRange === '30d') {
       timeStr = `${time.getMonth() + 1}/${time.getDate()}`;
     } else {
-      timeStr = `${time.getHours()}:00`;
+      const hours = time.getHours().toString().padStart(2, '0');
+      timeStr = `${hours}:00`;
     }
     
     categories.push(timeStr);
@@ -95,7 +100,22 @@ const updateChart = () => {
       trigger: 'axis',
       axisPointer: {
         type: 'shadow'
-      }
+      },
+      formatter: function (params: any[]) {
+        if (!params || params.length === 0) return '';
+            let tip = `<strong>${params[0].axisValueLabel || ''}</strong><br>`; // 使用安全属性访问
+            params.forEach((item) => {
+                // 添加数据存在性检查
+                if (item.value != null) {
+                    tip += `
+                    <div style="display: flex; align-items: center; margin: 5px 0">
+                        <span style="display:inline-block;width:10px;height:10px;background:${item.color};border-radius:50%;margin-right:6px"></span>
+                        ${item.seriesName}: <strong>${item.value ?? 'N/A'}</strong>
+                    </div>`;
+                }
+            });
+            return tip;
+        }
     },
     legend: {
       data: ['执行总数', '失败数']
@@ -117,20 +137,32 @@ const updateChart = () => {
       {
         name: '执行总数',
         type: 'bar',
-        data: data.map(item => item.total),
+        data: data.map(item => item.total ?? 0),
         itemStyle: {
           color: '#3B82F6'
         },
         barGap: '0%',
-        barCategoryGap: '20%'
+        barCategoryGap: '20%',
+            label: {
+                show: true,
+                position: 'top',
+                color: '#3B82F6',
+                formatter: '{c}'
+            }
       },
       {
         name: '失败数',
         type: 'bar',
-        data: data.map(item => item.failed),
+        data: data.map(item => item.failed ?? 0),
         itemStyle: {
           color: '#EF4444'
-        }
+        },
+        label: {
+                show: true,
+                position: 'top',
+                color: '#EF4444',
+                formatter: '{c}'
+            }
       }
     ]
   };
