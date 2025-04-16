@@ -58,28 +58,20 @@ const generateMockData = () => {
     
     categories.push(timeStr);
     
-    // CPU使用率 - 随机生成但保持一定的趋势性
-    const cpu = Math.round(30 + Math.random() * 40);
+    const totalCases = Math.floor(Math.random() * 150 + 50); // 50-200之间的随机数
+    let failedCases = Math.floor(Math.random() * totalCases * 0.3); // 失败数不超过30%
     
-    // 内存使用率 - 随机生成但保持一定的趋势性
-    const memory = Math.round(40 + Math.random() * 35);
-    
-    // 模拟特定服务器的不同使用模式
-    let cpuValue = cpu;
-    let memoryValue = memory;
-    
+    // 根据服务器调整失败率
     if (props.serverId !== 'all') {
       const serverId = parseInt(props.serverId);
-      if (serverId % 3 === 0) {
-        cpuValue = Math.min(95, cpu + 20); // 高CPU使用率
-      } else if (serverId % 3 === 1) {
-        memoryValue = Math.min(90, memory + 25); // 高内存使用率
+      if (serverId % 2 === 0) {
+        failedCases = Math.floor(totalCases * 0.4 + Math.random() * 10); // 偶数服务器失败率40%+
       }
     }
     
     data.push({
-      cpu: cpuValue,
-      memory: memoryValue
+      total: totalCases,
+      failed: failedCases
     });
   }
   
@@ -106,7 +98,7 @@ const updateChart = () => {
       }
     },
     legend: {
-      data: ['CPU使用率', '内存使用率']
+      data: ['执行总数', '失败数']
     },
     grid: {
       left: '3%',
@@ -119,37 +111,25 @@ const updateChart = () => {
       data: categories
     },
     yAxis: {
-      type: 'value',
-      max: 100,
-      axisLabel: {
-        formatter: '{value}%'
-      }
+      type: 'value'
     },
     series: [
       {
-        name: 'CPU使用率',
-        type: 'line',
-        data: data.map(item => item.cpu),
-        smooth: true,
-        lineStyle: {
-          width: 3,
-          color: '#3B82F6'
-        },
+        name: '执行总数',
+        type: 'bar',
+        data: data.map(item => item.total),
         itemStyle: {
           color: '#3B82F6'
-        }
+        },
+        barGap: '0%',
+        barCategoryGap: '20%'
       },
       {
-        name: '内存使用率',
-        type: 'line',
-        data: data.map(item => item.memory),
-        smooth: true,
-        lineStyle: {
-          width: 3,
-          color: '#10B981'
-        },
+        name: '失败数',
+        type: 'bar',
+        data: data.map(item => item.failed),
         itemStyle: {
-          color: '#10B981'
+          color: '#EF4444'
         }
       }
     ]

@@ -73,6 +73,13 @@ onMounted(() => {
         server: '张三服务器-02', 
         timestamp: '2025-03-22 04:30:15',
         acknowledged: true
+      },{ 
+        id: '5', 
+        level: 'warning', 
+        message: '客户限仓用例03', 
+        server: '张三服务器-03', 
+        timestamp: '2025-03-22 04:35:15',
+        acknowledged: true
       },
     ];
     loading.value = false;
@@ -98,7 +105,7 @@ const acknowledgeAlert = (alertId: string) => {
     
     <!-- 任务列表 -->
     <div v-else-if="alerts.length > 0">
-      <ul class="divide-y divide-gray-200">
+      <ul class="max-h-[200px] overflow-y-auto">
         <li v-for="alert in alerts" :key="alert.id" class="py-3">
           <div class="flex justify-between items-start">
             <div>
@@ -149,6 +156,6 @@ const acknowledgeAlert = (alertId: string) => {
 
 <style scoped>
 .task-execution-overview {
-  /* 修改样式类名 */
+  height: 100%;
 }
 </style>

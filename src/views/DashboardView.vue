@@ -36,7 +36,7 @@ onMounted(() => {
       </div>
       
       <div class="card mb-8">
-        <h2 class="text-lg font-semibold mb-4">服务器资源使用情况</h2>
+        <h2 class="text-lg font-semibold mb-4">用例通过情况</h2>
         <ServerStatusChart />
       </div>
       
