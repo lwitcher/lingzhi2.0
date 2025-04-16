@@ -2,21 +2,70 @@
 import { ref, onMounted, computed, nextTick } from 'vue';
 import * as echarts from 'echarts';
 
+export interface Server {
+  id: string | number
+  name: string
+  status: ServiceStatus
+  ip?: string
+  type: string
+}
+
+const services = ref<{name: string, status: ServiceStatus}[]>([
+  { name: 'Web服务', status: 'online' },
+  { name: '数据库', status: 'warning' },
+  { name: '缓存服务', status: 'offline' }
+]);
+
+interface ServerInfo {
+  os: string;
+  cpu: {
+    model: string;
+    cores: number;
+    usage: number;
+    temperature: number;
+  };
+  memory: {
+    total: string;
+    usage: number;
+    available: string;
+  };
+  disk: {
+    total: string;
+    usage: number;
+    available: string;
+  };
+  network: {
+    interface: string;
+    ipAddress: string;
+    macAddress: string;
+    uploadSpeed: string;
+    downloadSpeed: string;
+  };
+  services: Array<{
+    name: string;
+    status: ServiceStatus;
+    uptime: string;
+  }>;
+  uptime: string;
+  lastReboot: string;
+}
+
 const props = defineProps({
   server: {
-    type: Object,
+    type: Object as () => Server,
     required: true
   }
 });
 
-const serverInfo = ref(null);
-const loading = ref(true);
-const cpuChartContainer = ref(null);
-const memoryChartContainer = ref(null);
-const diskChartContainer = ref(null);
-let cpuChart = null;
-let memoryChart = null;
-let diskChart = null;
+
+const serverInfo = ref<ServerInfo | null>(null);
+const loading = ref<boolean>(true);
+const cpuChartContainer = ref<HTMLElement | null>(null);
+const memoryChartContainer = ref<HTMLElement | null>(null);
+const diskChartContainer = ref<HTMLElement | null>(null);
+let cpuChart: echarts.ECharts | null = null;
+let memoryChart: echarts.ECharts | null = null;
+let diskChart: echarts.ECharts | null = null;
 
 // 计算服务器状态颜色
 const statusColor = computed(() => {
@@ -51,7 +100,7 @@ onMounted(() => {
   // 模拟API请求延迟
   setTimeout(() => {
     // 生成随机值，但基于服务器ID保持一致性
-    const serverId = parseInt(props.server.id);
+    const serverId = parseInt(String(props.server.id));
     const cpuUsage = 30 + (serverId % 5) * 10 + Math.round(Math.random() * 10);
     const memoryUsage = 40 + (serverId % 4) * 10 + Math.round(Math.random() * 15);
     const diskUsage = 50 + (serverId % 3) * 10 + Math.round(Math.random() * 10);
@@ -76,8 +125,8 @@ onMounted(() => {
       },
       network: {
         interface: 'eth0',
-        ipAddress: props.server.ip,
-        macAddress: '00:1B:44:11:3A:' + props.server.id.padStart(2, '0'),
+        ipAddress: props.server.ip || '0.0.0.0',
+        macAddress: '00:1B:44:11:3A:' + String(props.server.id).padStart(2, '0'),
         uploadSpeed: '10.5 MB/s',
         downloadSpeed: '25.2 MB/s'
       },
@@ -262,39 +311,35 @@ const initCharts = () => {
 };
 
 // 获取CPU颜色
-const getCpuColor = (usage) => {
+const getCpuColor = (usage: number) => {
   if (usage < 50) return '#10B981';
   if (usage < 80) return '#F59E0B';
   return '#EF4444';
 };
 
 // 获取内存颜色
-const getMemoryColor = (usage) => {
+const getMemoryColor = (usage: number) => {
   if (usage < 60) return '#10B981';
   if (usage < 85) return '#F59E0B';
   return '#EF4444';
 };
 
 // 获取磁盘颜色
-const getDiskColor = (usage) => {
+const getDiskColor = (usage: number) => {
   if (usage < 70) return '#10B981';
   if (usage < 90) return '#F59E0B';
   return '#EF4444';
 };
 
 // 获取服务状态标签样式
-const getServiceStatusClass = (status) => {
+import type { ServiceStatus } from '@/types/server';
+const getServiceStatusClass = (status: ServiceStatus) => {
   switch (status) {
-    case 'running':
-      return 'bg-green-100 text-green-800';
-    case 'warning':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'stopped':
-      return 'bg-red-100 text-red-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
+    case 'online': return 'bg-green-100 text-green-800';
+    case 'offline': return 'bg-red-100 text-red-800';
+    case 'warning': return 'bg-yellow-100 text-yellow-800';
   }
-};
+}
 </script>
 
 <template>
@@ -462,3 +507,4 @@ const getServiceStatusClass = (status) => {
     </div>
   </div>
 </template>
+

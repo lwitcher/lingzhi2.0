@@ -11,7 +11,9 @@ const props = defineProps({
 const emit = defineEmits(['server-selected']);
 
 // 模拟服务器列表数据
-const servers = ref([]);
+import type { Server, ServiceStatus } from '@/types/server';
+
+const servers = ref<Server[]>([]);
 const loading = ref(true);
 const searchQuery = ref('');
 
@@ -28,7 +30,7 @@ const filteredServers = () => {
 };
 
 // 获取状态类名
-const getStatusClass = (status) => {
+const getStatusClass = (status: ServiceStatus) => {
   switch (status) {
     case 'online':
       return 'bg-green-100 text-green-800';
@@ -42,7 +44,7 @@ const getStatusClass = (status) => {
 };
 
 // 获取状态文本
-const getStatusText = (status) => {
+const getStatusText = (status: ServiceStatus) => {
   switch (status) {
     case 'online':
       return '在线';
@@ -88,7 +90,7 @@ onMounted(() => {
 });
 
 // 处理服务器选择
-const handleServerSelect = (server) => {
+const handleServerSelect = (server: Server) => {
   emit('server-selected', server);
 };
 </script>
@@ -157,4 +159,4 @@ const handleServerSelect = (server) => {
       <div>没有找到匹配的服务器</div>
     </div>
   </div>
-</template> 
+</template>

@@ -13,8 +13,9 @@ const props = defineProps({
   }
 });
 
-const chartContainer = ref(null);
-let chart = null;
+// 使用类型化声明
+const chartContainer = ref<HTMLElement | null>(null);
+const chart = ref<echarts.ECharts | null>(null);
 
 // 模拟数据生成函数
 const generateMockData = () => {
@@ -107,13 +108,13 @@ const generateMockData = () => {
 
 const initChart = () => {
   if (chartContainer.value) {
-    chart = echarts.init(chartContainer.value);
+    chart.value = echarts.init(chartContainer.value);
     updateChart();
   }
 };
 
 const updateChart = () => {
-  if (!chart) return;
+  if (!chart.value) return;
   
   const { inboundData, outboundData, categories } = generateMockData();
   
@@ -211,11 +212,11 @@ const updateChart = () => {
     ]
   };
   
-  chart.setOption(option);
+  chart.value.setOption(option);
 };
 
 const handleResize = () => {
-  chart && chart.resize();
+  chart.value && chart.value.resize();
 };
 
 onMounted(() => {
@@ -224,9 +225,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (chart) {
-    chart.dispose();
-    chart = null;
+  if (chart.value) {
+    chart.value.dispose();
+    chart.value = null;
   }
   window.removeEventListener('resize', handleResize);
 });
@@ -241,4 +242,4 @@ watch(
 
 <template>
   <div ref="chartContainer" class="w-full h-80"></div>
-</template> 
+</template>

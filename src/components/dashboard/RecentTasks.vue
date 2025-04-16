@@ -2,36 +2,43 @@
 import { ref, onMounted } from 'vue';
 
 // 模拟任务数据
-const tasks = ref([]);
+import type { ServiceStatus } from '@/types/server';
+
+interface Task {
+  id: number
+  name: string
+  server: string
+  status: ServiceStatus
+  startTime: string | null
+  endTime: string | null
+}
+
+const tasks = ref<Task[]>([]);
 const loading = ref(true);
 
 // 获取任务状态样式
-const getTaskStatusClass = (status) => {
+const getTaskStatusClass = (status: Task['status']) => {
   switch (status) {
-    case 'completed':
+    case 'online':
       return 'bg-green-100 text-green-800';
-    case 'running':
-      return 'bg-blue-100 text-blue-800';
-    case 'failed':
+    case 'warning':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'offline':
       return 'bg-red-100 text-red-800';
-    case 'queued':
-      return 'bg-gray-100 text-gray-800';
     default:
       return 'bg-gray-100 text-gray-800';
   }
 };
 
 // 获取任务状态文本
-const getTaskStatusText = (status) => {
+const getTaskStatusText = (status: ServiceStatus) => {
   switch (status) {
-    case 'completed':
-      return '已完成';
-    case 'running':
-      return '运行中';
-    case 'failed':
-      return '失败';
-    case 'queued':
-      return '队列中';
+    case 'online':
+      return '在线';
+    case 'warning':
+      return '告警';
+    case 'offline':
+      return '离线';
     default:
       return '未知';
   }
@@ -46,7 +53,7 @@ onMounted(() => {
         id: 1, 
         name: '全量用例回归任务', 
         server: '李四服务器-01', 
-        status: 'completed', 
+        status: 'online', 
         startTime: '2025-03-22 03:15:10',
         endTime: '2025-03-22 04:05:32'
       },
@@ -54,7 +61,7 @@ onMounted(() => {
         id: 2, 
         name: '模糊测试任务', 
         server: '李四服务器-02', 
-        status: 'completed', 
+        status: 'online', 
         startTime: '2025-03-22 04:00:00',
         endTime: '2025-03-22 04:15:23'
       },
@@ -62,7 +69,7 @@ onMounted(() => {
         id: 3, 
         name: '撮合模块性能测试任务', 
         server: '李四服务器-03', 
-        status: 'running', 
+        status: 'warning', 
         startTime: '2025-03-22 05:30:00',
         endTime: null
       },
@@ -70,7 +77,7 @@ onMounted(() => {
         id: 4, 
         name: '新一代交易系统对比测试', 
         server: '李四服务器-03', 
-        status: 'queued', 
+        status: 'warning', 
         startTime: null,
         endTime: null
       },
@@ -78,7 +85,7 @@ onMounted(() => {
         id: 5, 
         name: '项目A持续集成任务', 
         server: '李四服务器-01', 
-        status: 'failed', 
+        status: 'offline', 
         startTime: '2025-03-22 04:25:12',
         endTime: '2025-03-22 04:25:45'
       },
@@ -116,14 +123,12 @@ onMounted(() => {
                 'px-2 py-1 text-xs font-medium rounded-full',
                 getTaskStatusClass(task.status)
               ]">
-                {{ getTaskStatusText(task.status) }}
+                {{ task.status === 'running' ? '运行中' : getTaskStatusText(task.status) }}
               </span>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-              <div v-if="task.status === 'queued'">
-                等待执行
-              </div>
-              <div v-else-if="task.status === 'running'">
+              
+              <div v-if="task.status === 'running'">
                 {{ task.startTime }} 开始
               </div>
               <div v-else>

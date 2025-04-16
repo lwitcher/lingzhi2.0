@@ -6,10 +6,25 @@ import TestCaseDetails from '@/components/testcase/TestCaseDetails.vue';
 import TestCaseForm from '@/components/testcase/TestCaseForm.vue';
 import { DataAnalysis, Document } from '@element-plus/icons-vue'; // 添加这行
 
+interface TestCase {
+  id: string | number;
+  name: string;
+  description?: string;
+  status?: string;
+  priority?: string;
+  [key: string]: any;
+}
+
+interface FilterOptions {
+  status?: string;
+  priority?: string;
+  [key: string]: any;
+}
+
 const router = useRouter();
 
 const activeView = ref('list'); // list, details, create, edit
-const selectedTestCase = ref(null);
+const selectedTestCase = ref<TestCase | null>(null);
 const loading = ref(true);
 const filters = ref({
   status: 'all',
@@ -33,12 +48,12 @@ onMounted(() => {
   }, 800);
 });
 
-const handleViewTestCase = (testCase) => {
+const handleViewTestCase = (testCase: TestCase) => {
   selectedTestCase.value = testCase;
   activeView.value = 'details';
 };
 
-const handleEditTestCase = (testCase) => {
+const handleEditTestCase = (testCase: TestCase) => {
   selectedTestCase.value = testCase;
   activeView.value = 'edit';
 };
@@ -74,7 +89,7 @@ const handleTestCaseSaved = () => {
   }, 600);
 };
 
-const handleFilterChange = (newFilters) => {
+const handleFilterChange = (newFilters: FilterOptions) => {
   filters.value = { ...filters.value, ...newFilters };
   // 在实际应用中，这里会触发用例列表的重新加载
 };

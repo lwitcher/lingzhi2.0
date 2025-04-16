@@ -20,8 +20,9 @@ onMounted(() => {
   });
   
   // 点击页面其他位置关闭用户菜单
-  document.addEventListener('click', (event) => {
-    if (!event.target.closest('.user-menu-container')) {
+  document.addEventListener('click', (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (!target?.closest?.('.user-menu-container')) {
       userMenuOpen.value = false;
     }
   });
@@ -39,9 +40,11 @@ const closeMobileMenu = () => {
   mobileMenuOpen.value = false;
 };
 
-const toggleUserMenu = (event) => {
-  event.stopPropagation();
-  userMenuOpen.value = !userMenuOpen.value;
+const toggleUserMenu = (event: MouseEvent) => {
+  if (event.target && !(event.target as Element).closest('.user-menu-container')) {
+    event.stopPropagation();
+    userMenuOpen.value = !userMenuOpen.value;
+  };
 };
 
 const handleLogout = () => {
@@ -50,7 +53,14 @@ const handleLogout = () => {
   userMenuOpen.value = false;
 };
 
-const menuItems = [
+interface MenuItem {
+  name: string;
+  route: string;
+  icon: string;
+  children?: MenuItem[];
+}
+
+const menuItems: MenuItem[] = [
   {
     name: '仪表盘',
     route: '/',
@@ -92,7 +102,7 @@ const menuItems = [
   */
 ];
 
-const isActive = (path) => {
+const isActive = (path: string) => {
   if (path === '/') {
     return route.path === '/';
   }

@@ -24,8 +24,8 @@ interface Process {
   memory: number;
 }
 
-const selectedServer = ref(null);
-const terminalLogs = ref([
+const selectedServer = ref<any>(null);
+const terminalLogs = ref<string[]>([
   '',
   '[2025-03-22 09:00:00] 已连接到服务器 cluster-node-01',
   '[2025-03-22 09:00:02] 正在同步系统状态...',
@@ -61,7 +61,13 @@ const serverConfigForm = ref({
   password: ''
 })
 
-const servers = ref([
+interface Server {
+  id: number;
+  name: string;
+  status: 'online' | 'offline';
+}
+
+const servers = ref<Server[]>([
   { id: 1, name: '生产服务器-01', status: 'online' },
   { id: 2, name: '测试服务器-01', status: 'online' },
   { id: 3, name: '开发服务器-01', status: 'offline' }
@@ -69,7 +75,7 @@ const servers = ref([
 
 const dialogType = ref('');
 
-const tools = ref([]);
+const tools = ref<string[]>([]);
 
 const openDialog = (action: 'restart' | 'toolchain' | 'process' | 'deploy' | 'files') => {
   dialogType.value = action;
@@ -124,6 +130,21 @@ const openDialog = (action: 'restart' | 'toolchain' | 'process' | 'deploy' | 'fi
             </el-form>
           </el-tab-pane>
         </el-tabs>
+      </div>
+    `,
+    'deploy': `
+      <div class="space-y-4">
+        <p>准备部署系统配置...</p>
+      </div>
+    `,
+    'files': `
+      <div class="space-y-4">
+        <p>准备文件传输配置...</p>
+      </div>
+    `,
+    'restart': `
+      <div class="space-y-4">
+        <p>准备服务器重启配置...</p>
       </div>
     `
   }[action] || `正在准备${dialogTitle.value}配置...`;

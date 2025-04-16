@@ -3,12 +3,14 @@
 const componentName = 'CaseExecutionOverview';
 import { ref, onMounted } from 'vue';
 
-// 模拟任务数据
-const alerts = ref([]);
+import type { Alert } from '@/types/server';
+
+const caseData = ref<Alert[]>([]);
+const alerts = ref<Alert[]>([]);
 const loading = ref(true);
 
 // 获取任务结果样式
-const getAlertLevelClass = (level) => {
+const getAlertLevelClass = (level: string) => {
   switch (level) {
     case 'critical':
       return 'bg-red-100 text-red-800';
@@ -22,7 +24,7 @@ const getAlertLevelClass = (level) => {
 };
 
 // 获取任务结果级别文本
-const getAlertLevelText = (level) => {
+const getAlertLevelText = (level: string) => {
   switch (level) {
     case 'critical':
       return '未通过';
@@ -41,7 +43,7 @@ onMounted(() => {
   setTimeout(() => {
     alerts.value = [
       { 
-        id: 1, 
+        id: '1',
         level: 'critical', 
         message: '客户限仓用例01', 
         server: '张三服务器-01', 
@@ -49,7 +51,7 @@ onMounted(() => {
         acknowledged: false
       },
       { 
-        id: 2, 
+        id: '2', 
         level: 'warning', 
         message: '实控组限仓用例03', 
         server: '张三服务器-01', 
@@ -57,7 +59,7 @@ onMounted(() => {
         acknowledged: false
       },
       { 
-        id: 3, 
+        id: '3', 
         level: 'warning', 
         message: '实控组限仓用例04', 
         server: '张三服务器-01', 
@@ -65,7 +67,7 @@ onMounted(() => {
         acknowledged: true
       },
       { 
-        id: 4, 
+        id: '4', 
         level: 'info', 
         message: '客户限仓用例02', 
         server: '张三服务器-02', 
@@ -78,7 +80,7 @@ onMounted(() => {
 });
 
 // 确认任务
-const acknowledgeAlert = (alertId) => {
+const acknowledgeAlert = (alertId: string) => {
   const alert = alerts.value.find(a => a.id === alertId);
   if (alert) {
     alert.acknowledged = true;

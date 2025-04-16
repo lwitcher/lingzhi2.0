@@ -24,7 +24,7 @@ onMounted(() => {
   }, 800);
 });
 
-const handleServerChange = (serverId) => {
+const handleServerChange = (serverId: string) => {
   selectedServerId.value = serverId;
   loading.value = true;
   
@@ -34,8 +34,9 @@ const handleServerChange = (serverId) => {
   }, 600);
 };
 
-const handleTimeRangeChange = (range) => {
-  timeRange.value = range;
+// 修改事件处理函数
+const handleTimeRangeChange = (value: string) => {
+  timeRange.value = value;
   loading.value = true;
   
   // 模拟数据重新加载
@@ -57,15 +58,18 @@ const handleTimeRangeChange = (range) => {
       
       <div class="flex items-center">
         <span class="mr-2">时间范围:</span>
-        <select 
-          v-model="timeRange" 
-          class="bg-white border border-gray-300 rounded-md px-3 py-1.5"
-          @change="handleTimeRangeChange($event.target.value)"
-        >
-          <option v-for="option in timeRangeOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
+        <div class="time-range-selector">
+          <label>时间范围：</label>
+          <select 
+            v-model="timeRange"
+            @change="handleTimeRangeChange(timeRange)"
+            class="time-range-select"
+          >
+            <option v-for="option in timeRangeOptions" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
       </div>
     </div>
     
@@ -95,4 +99,4 @@ const handleTimeRangeChange = (range) => {
       </div>
     </div>
   </div>
-</template> 
+</template>

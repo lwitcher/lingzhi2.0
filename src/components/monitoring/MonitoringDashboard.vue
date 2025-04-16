@@ -16,12 +16,13 @@ const timeRangeOptions = [
   { value: '30d', label: '最近30天' }
 ];
 
-const handleServerChange = (id) => {
+const handleServerChange = (id: string) => {
   serverId.value = id;
 };
 
-const handleTimeRangeChange = (e) => {
-  timeRange.value = e.target.value;
+const handleTimeRangeChange = (e: Event) => {
+    const target = e.target as HTMLSelectElement;
+    timeRange.value = target.value;
 };
 
 const timeRangeText = computed(() => {
@@ -94,4 +95,4 @@ const timeRangeText = computed(() => {
       </div>
     </div>
   </div>
-</template> 
+</template>

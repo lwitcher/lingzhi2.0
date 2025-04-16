@@ -2,7 +2,14 @@
 import { ref, onMounted } from 'vue';
 
 // 模拟服务器统计数据
-const serverStats = ref({
+import type { ServiceStatus } from '@/types/server';
+
+const serverStats = ref<{
+  total: number
+  online: number
+  warning: number
+  offline: number
+}>({
   total: 0,
   online: 0,
   warning: 0,
@@ -84,4 +91,4 @@ onMounted(() => {
       </div>
     </div>
   </div>
-</template> 
+</template>

@@ -2,10 +2,11 @@
 import { ref } from 'vue';
 import ServerList from '@/components/server/ServerList.vue';
 import ServerDetails from '@/components/server/ServerDetails.vue';
+import type { Server } from '@/components/server/ServerDetails.vue';
 
-const selectedServer = ref(null);
+const selectedServer = ref<Server | null>(null);
 
-const handleServerSelect = (server) => {
+const handleServerSelect = (server: Server) => {
   selectedServer.value = server;
 };
 </script>
@@ -29,4 +30,4 @@ const handleServerSelect = (server) => {
       </div>
     </div>
   </div>
-</template> 
+</template>
