@@ -5,7 +5,7 @@ import { Plus, Search, View, Edit, Delete, RefreshRight } from '@element-plus/ic
 interface Job {
   id: string;
   name: string;
-  type: string;
+  type: 'manual' | 'scheduled' | 'triggered';
   status: string;
   server: string;
   startTime: string | null;
@@ -51,25 +51,28 @@ const getStatusText = (status: string): string => {
 // 获取任务类型标签类型
 const getTypeTagType = (type: string): string => {
   const typeMap: Record<string, string> = {
-    'backup': 'success',
-    'maintenance': 'warning',
-    'deployment': 'primary',
-    'monitoring': 'info',
-    'security': 'danger'
+    'manual': 'primary',
+    'scheduled': 'warning',
+    'triggered': 'success'
   };
   return typeMap[type] || '';
 };
 
 // 生成模拟数据
 const generateMockJobs = (): Job[] => {
-  const types = ['backup', 'maintenance', 'deployment', 'monitoring', 'security'];
+  const types = ['manual', 'scheduled', 'triggered'];
   const statuses = ['pending', 'running', 'completed', 'failed', 'cancelled'];
-  const servers = ['Web服务器-01', '数据库服务器-02', '文件服务器-03', '应用服务器-04', '测试服务器-05'];
+  const servers = ['服务器-01', '服务器-02', '服务器-03', '服务器-04', '服务器-05'];
   const executors = ['系统', '张工程师', '王管理员', '李技术员', '赵主管'];
 
   return Array.from({ length: 45 }, (_, i) => {
     const id = `JOB-${1000 + i}`;
     const type = types[Math.floor(Math.random() * types.length)];
+    const typeNames = {
+      manual: '手动',
+      scheduled: '定时',
+      triggered: '触发'
+    };
     const status = statuses[Math.floor(Math.random() * statuses.length)];
 
     const now = new Date();
@@ -92,7 +95,7 @@ const generateMockJobs = (): Job[] => {
 
     return {
       id,
-      name: `${type === 'backup' ? '备份' : type === 'maintenance' ? '维护' : type === 'deployment' ? '部署' : type === 'monitoring' ? '监控' : '安全'} 任务 ${id}`,
+      name: `${typeNames[type]}任务 ${id}`,
       type,
       status,
       server: servers[Math.floor(Math.random() * servers.length)],
@@ -237,11 +240,9 @@ onMounted(() => {
             clearable
             class="w-full"
           >
-            <el-option label="备份" value="backup" />
-            <el-option label="维护" value="maintenance" />
-            <el-option label="部署" value="deployment" />
-            <el-option label="监控" value="monitoring" />
-            <el-option label="安全" value="security" />
+          <el-option label="手动" value="manual" />
+          <el-option label="定时" value="scheduled" />
+          <el-option label="触发" value="triggered" />
           </el-select>
         </el-col>
 
@@ -277,10 +278,10 @@ onMounted(() => {
         <el-table-column prop="type" label="类型" width="120">
           <template #default="scope">
             <el-tag :type="getTypeTagType(scope.row.type)" size="small">
-              {{ scope.row.type === 'backup' ? '备份' :
-                 scope.row.type === 'maintenance' ? '维护' :
-                 scope.row.type === 'deployment' ? '部署' :
-                 scope.row.type === 'monitoring' ? '监控' : '安全' }}
+              {{
+                scope.row.type === 'manual' ? '手动' :
+                scope.row.type === 'scheduled' ? '定时' : '触发'
+              }}
             </el-tag>
           </template>
         </el-table-column>
