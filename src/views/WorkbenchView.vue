@@ -87,11 +87,11 @@ const openDialog = (action: 'restart' | 'toolchain' | 'process' | 'deploy' | 'fi
   dialogTitle.value = {
     'restart': '服务器重启',
     'toolchain': '一键部署工具链',
-    'process': '进程管理',  
+    'process': '进程管理',
     'deploy': '系统部署',
     'files': '文件传输'
   }[action];
-  
+
   dialogContent.value = {
     'toolchain': `
       <div class="space-y-4">
@@ -153,7 +153,7 @@ const openDialog = (action: 'restart' | 'toolchain' | 'process' | 'deploy' | 'fi
       </div>
     `
   }[action] || `正在准备${dialogTitle.value}配置...`;
-  
+
   dialogVisible.value = true;
 };
 
@@ -181,9 +181,9 @@ const initChart = () => {
 // 更新图表数据
 const updateChart = () => {
   if (!chartInstance.value) return;
-  
+
   const data = generateMockOrderData();
-  
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -203,17 +203,25 @@ const updateChart = () => {
       name: '委托数量',
       type: 'line',
       data: data.map(d => d.count),
-      smooth: true,
+      smooth: false, // 从true改为false
       lineStyle: {
         width: 3,
         color: '#3B82F6'
       },
       itemStyle: {
         color: '#3B82F6'
-      }
+      },
+      label: {
+    show: true, // 显示数值标签
+    position: 'top', // 标签显示在数据点上方
+    color: '#3B82F6', // 使用与线条相同的颜色
+    backgroundColor: 'rgba(255,255,255,0.9)', // 白色背景增加可读性
+    borderRadius: 4,
+    padding: [4, 6]
+  }
     }]
   };
-  
+
   chartInstance.value.setOption(option);
 };
 
@@ -239,7 +247,7 @@ onUnmounted(() => {
         <template #header>
           <div class="flex justify-between items-center">
             <h3 class="font-medium">服务器管理</h3>
-            <el-button 
+            <el-button
               type="primary"
               size="small"
               :icon="serverCardCollapsed ? ArrowDown : ArrowUp"
@@ -280,7 +288,7 @@ onUnmounted(() => {
   <template #header>
     <div class="flex justify-between items-center">
       <h3 class="font-medium">交易系统快捷操作</h3>
-      <el-button 
+      <el-button
         type="primary"
         size="small"
         :icon="quickActionCollapsed ? ArrowDown : ArrowUp"
@@ -320,7 +328,7 @@ onUnmounted(() => {
       </el-card>
       <el-card shadow="hover">
     <template #header>
-      <h2 class="text-lg font-semibold">委托数量趋势（最近5分钟）</h2>
+      <h2 class="text-lg font-semibold">委托数量趋势</h2>
     </template>
     <div ref="chartContainer" class="h-80"></div>
   </el-card>
@@ -338,9 +346,9 @@ onUnmounted(() => {
           <el-input v-model="serverConfigForm.username" placeholder="输入用户名" />
         </el-form-item>
         <el-form-item label="密码">
-          <el-input 
-            v-model="serverConfigForm.password" 
-            type="password" 
+          <el-input
+            v-model="serverConfigForm.password"
+            type="password"
             placeholder="输入密码"
             show-password
           />
@@ -393,7 +401,7 @@ onUnmounted(() => {
           </el-form-item>
           <el-form-item label="仓库地址">
             <el-select v-model="deployConfig.repository" class="w-full">
-              <el-option 
+              <el-option
                 label="生产仓库 (github.com/example/trading-system)"
                 value="https://github.com/example/trading-system.git"
               />

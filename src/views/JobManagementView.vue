@@ -66,21 +66,21 @@ const generateMockJobs = (): Job[] => {
   const statuses = ['pending', 'running', 'completed', 'failed', 'cancelled'];
   const servers = ['Web服务器-01', '数据库服务器-02', '文件服务器-03', '应用服务器-04', '测试服务器-05'];
   const executors = ['系统', '张工程师', '王管理员', '李技术员', '赵主管'];
-  
+
   return Array.from({ length: 45 }, (_, i) => {
     const id = `JOB-${1000 + i}`;
     const type = types[Math.floor(Math.random() * types.length)];
     const status = statuses[Math.floor(Math.random() * statuses.length)];
-    
+
     const now = new Date();
     const startTime = status !== 'pending' ? new Date(now.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleString() : null;
-    
+
     let endTime = null;
     if (status === 'completed' || status === 'failed' || status === 'cancelled') {
       const start = startTime ? new Date(startTime).getTime() : now.getTime();
       endTime = new Date(start + Math.random() * 24 * 60 * 60 * 1000).toLocaleString();
     }
-    
+
     let progress = 0;
     if (status === 'running') {
       progress = Math.floor(Math.random() * 90) + 10;
@@ -89,7 +89,7 @@ const generateMockJobs = (): Job[] => {
     } else if (status === 'failed' || status === 'cancelled') {
       progress = Math.floor(Math.random() * 100);
     }
-    
+
     return {
       id,
       name: `${type === 'backup' ? '备份' : type === 'maintenance' ? '维护' : type === 'deployment' ? '部署' : type === 'monitoring' ? '监控' : '安全'} 任务 ${id}`,
@@ -115,20 +115,20 @@ const filterJobs = () => {
           !job.server.toLowerCase().includes(searchQuery.value.toLowerCase())) {
         return false;
       }
-      
+
       // 状态过滤
       if (statusFilter.value && job.status !== statusFilter.value) {
         return false;
       }
-      
+
       // 类型过滤
       if (typeFilter.value && job.type !== typeFilter.value) {
         return false;
       }
-      
+
       return true;
     });
-    
+
     return filtered;
   }
   return [];
@@ -201,7 +201,7 @@ onMounted(() => {
         <el-icon><Plus /></el-icon> 创建任务
       </el-button>
     </div>
-    
+
     <!-- 过滤器 -->
     <div class="bg-white p-4 rounded-md shadow-sm mb-6">
       <el-row :gutter="20">
@@ -214,7 +214,7 @@ onMounted(() => {
             class="w-full"
           />
         </el-col>
-        
+
         <el-col :xs="12" :sm="6" :md="6" :lg="4">
           <el-select
             v-model="statusFilter"
@@ -229,7 +229,7 @@ onMounted(() => {
             <el-option label="已取消" value="cancelled" />
           </el-select>
         </el-col>
-        
+
         <el-col :xs="12" :sm="6" :md="6" :lg="4">
           <el-select
             v-model="typeFilter"
@@ -244,7 +244,7 @@ onMounted(() => {
             <el-option label="安全" value="security" />
           </el-select>
         </el-col>
-        
+
         <el-col :xs="24" :sm="4" :md="4" :lg="3" class="flex items-center mt-2 sm:mt-0">
           <el-button type="text" @click="resetFilters">
             <el-icon><RefreshRight /></el-icon> 重置过滤器
@@ -252,7 +252,7 @@ onMounted(() => {
         </el-col>
       </el-row>
     </div>
-    
+
     <!-- 任务列表 -->
     <div class="bg-white rounded-md shadow-sm">
       <el-table
@@ -263,7 +263,7 @@ onMounted(() => {
       >
         <!-- ID列 -->
         <el-table-column prop="id" label="任务ID" width="100" sortable />
-        
+
         <!-- 名称列 -->
         <el-table-column prop="name" label="任务名称" min-width="180" sortable>
           <template #default="scope">
@@ -272,19 +272,19 @@ onMounted(() => {
             </el-link>
           </template>
         </el-table-column>
-        
+
         <!-- 类型列 -->
         <el-table-column prop="type" label="类型" width="120">
           <template #default="scope">
             <el-tag :type="getTypeTagType(scope.row.type)" size="small">
-              {{ scope.row.type === 'backup' ? '备份' : 
+              {{ scope.row.type === 'backup' ? '备份' :
                  scope.row.type === 'maintenance' ? '维护' :
                  scope.row.type === 'deployment' ? '部署' :
                  scope.row.type === 'monitoring' ? '监控' : '安全' }}
             </el-tag>
           </template>
         </el-table-column>
-        
+
         <!-- 状态列 -->
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
@@ -293,54 +293,54 @@ onMounted(() => {
             </el-tag>
           </template>
         </el-table-column>
-        
+
         <!-- 进度列 -->
         <el-table-column prop="progress" label="进度" width="180">
           <template #default="scope">
-            <el-progress 
-              :percentage="scope.row.progress" 
-              :status="scope.row.status === 'failed' ? 'exception' : 
+            <el-progress
+              :percentage="scope.row.progress"
+              :status="scope.row.status === 'failed' ? 'exception' :
                       scope.row.status === 'completed' ? 'success' : ''"
             />
           </template>
         </el-table-column>
-        
+
         <!-- 服务器列 -->
         <el-table-column prop="server" label="服务器" width="150" />
-        
+
         <!-- 执行人列 -->
         <el-table-column prop="executor" label="执行人" width="120" />
-        
+
         <!-- 开始时间列 -->
         <el-table-column prop="startTime" label="开始时间" width="170">
           <template #default="scope">
             {{ scope.row.startTime || '未开始' }}
           </template>
         </el-table-column>
-        
+
         <!-- 结束时间列 -->
         <el-table-column prop="endTime" label="结束时间" width="170">
           <template #default="scope">
             {{ scope.row.endTime || '进行中' }}
           </template>
         </el-table-column>
-        
+
         <!-- 操作列 -->
         <el-table-column label="操作" fixed="right" width="160">
           <template #default="scope">
             <div class="button-group">
-              <el-button 
-                size="small" 
-                type="primary" 
+              <el-button
+                size="small"
+                type="primary"
                 @click="viewJobDetails(scope.row)"
               >
                 <el-icon class="button-icon"><View /></el-icon>
                 详情
               </el-button>
-              
-              <el-button 
-                size="small" 
-                type="danger" 
+
+              <el-button
+                size="small"
+                type="danger"
                 @click="cancelJob(scope.row)"
                 v-if="scope.row.status === 'pending' || scope.row.status === 'running'"
               >
@@ -351,7 +351,7 @@ onMounted(() => {
           </template>
         </el-table-column>
       </el-table>
-      
+
       <!-- 分页 -->
       <div class="flex justify-center p-4">
         <el-pagination
